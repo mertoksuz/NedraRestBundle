@@ -8,7 +8,6 @@
   "license" : [
     "MIT"
   ],
-  "target-dir" : "MertOksuz/ApiBundle",
   "require": {
     "php": "~5.5|~7.0",
     "symfony/framework-bundle": "^2.8|^3.3",
