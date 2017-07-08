@@ -1,0 +1,3 @@
+mert_oksuz_api_homepage:
+    path:     /
+    defaults: { _controller: MertOksuzApiBundle:Default:index }
