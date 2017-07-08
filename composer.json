@@ -1,0 +1,19 @@
+{
+  "name": "mertoksuz/api-bundle",
+  "autoload": {
+    "psr-4": {
+      "MertOksuz\\ApiBundle\\": "src/"
+    }
+  },
+  "keywords" : [
+    "symfony based api bundle"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "target-dir" : "MertOksuz/ApiBundle",
+  "require": {
+    "nelmio/api-doc-bundle": "2.*",
+    "friendsofsymfony/rest-bundle": "^2.0"
+  }
+}
