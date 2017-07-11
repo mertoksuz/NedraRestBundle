@@ -2,8 +2,12 @@
 
 namespace MertOksuz\ApiBundle\DependencyInjection;
 
+use Sylius\Bundle\ResourceBundle\DependencyInjection\Driver\DriverProvider;
+use Sylius\Bundle\ResourceBundle\SyliusResourceBundle;
+use Sylius\Component\Resource\Metadata\Metadata;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -24,5 +28,33 @@ class MertOksuzApiExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $this->loadResources($config['entities'], $container);
+    }
+
+    private function loadResources(array $resources, ContainerBuilder $container)
+    {
+        foreach ($resources as $alias => $resourceConfig) {
+            $metadata = Metadata::fromAliasAndConfiguration($alias, $resourceConfig);
+
+            $resources = $container->hasParameter('sylius.resources') ? $container->getParameter('sylius.resources') : [];
+            $resources = array_merge($resources, [$alias => $resourceConfig]);
+            $container->setParameter('sylius.resources', $resources);
+
+            DriverProvider::get($metadata)->load($container, $metadata);
+
+            if ($metadata->hasParameter('translation')) {
+                $alias = $alias.'_translation';
+                $resourceConfig = array_merge(['driver' => $resourceConfig['driver']], $resourceConfig['translation']);
+
+                $resources = $container->hasParameter('sylius.resources') ? $container->getParameter('sylius.resources') : [];
+                $resources = array_merge($resources, [$alias => $resourceConfig]);
+                $container->setParameter('sylius.resources', $resources);
+
+                $metadata = Metadata::fromAliasAndConfiguration($alias, $resourceConfig);
+
+                DriverProvider::get($metadata)->load($container, $metadata);
+            }
+        }
     }
 }
