@@ -3,11 +3,9 @@
 namespace MertOksuz\ApiBundle\DependencyInjection;
 
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Driver\DriverProvider;
-use Sylius\Bundle\ResourceBundle\SyliusResourceBundle;
 use Sylius\Component\Resource\Metadata\Metadata;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -25,9 +23,6 @@ class MertOksuzApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
 
         $this->loadResources($config['entities'], $container);
     }
@@ -55,6 +50,7 @@ class MertOksuzApiExtension extends Extension
 
                 DriverProvider::get($metadata)->load($container, $metadata);
             }
+
         }
     }
 }
