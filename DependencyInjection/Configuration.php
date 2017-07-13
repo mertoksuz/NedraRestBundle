@@ -25,11 +25,19 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('mert_oksuz_api');
 
-        $rootNode
+        $this->addDriversSection($rootNode);
+        $this->addEntitiesSection($rootNode);
+
+        return $treeBuilder;
+    }
+
+    private function addEntitiesSection(ArrayNodeDefinition $node)
+    {
+        $node
             ->children()
                 ->scalarNode("active")->defaultTrue()->end()
                 ->arrayNode("entities")
-                    ->useAttributeAsKey('name')
+                ->useAttributeAsKey('name')
                     ->prototype("array")
                         ->children()
                             ->scalarNode('driver')->defaultValue(SyliusResourceBundle::DRIVER_DOCTRINE_ORM)->end()
@@ -48,7 +56,20 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
 
-        return $treeBuilder;
+    /**
+     * @param ArrayNodeDefinition $node
+     */
+    private function addDriversSection(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('drivers')
+                    ->defaultValue([SyliusResourceBundle::DRIVER_DOCTRINE_ORM])
+                    ->prototype('enum')->values(SyliusResourceBundle::getAvailableDrivers())->end()
+                ->end()
+            ->end()
+        ;
     }
 }
