@@ -1,0 +1,4 @@
+services:
+    MertOksuz\ApiBundle\Routing\RouteLoader:
+        arguments: ["@service_container", "@argument_metadata_factory"]
+        tags: [routing.loader]

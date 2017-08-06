@@ -2,10 +2,8 @@
 
 namespace MertOksuz\ApiBundle\DependencyInjection;
 
-use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
-use Sylius\Bundle\ResourceBundle\Form\Type\DefaultResourceType;
-use Sylius\Bundle\ResourceBundle\SyliusResourceBundle;
-use Sylius\Component\Resource\Factory\Factory;
+use MertOksuz\ApiBundle\Controller\ResourceController;
+use MertOksuz\ApiBundle\MertOksuzApiBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -25,7 +23,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('mert_oksuz_api');
 
-        $this->addDriversSection($rootNode);
         $this->addEntitiesSection($rootNode);
 
         return $treeBuilder;
@@ -40,7 +37,7 @@ class Configuration implements ConfigurationInterface
                 ->useAttributeAsKey('name')
                     ->prototype("array")
                         ->children()
-                            ->scalarNode('driver')->defaultValue(SyliusResourceBundle::DRIVER_DOCTRINE_ORM)->end()
+                            ->scalarNode('driver')->defaultValue(MertOksuzApiBundle::DRIVER_DOCTRINE_ORM)->end()
                             ->arrayNode('classes')
                             ->isRequired()
                             ->addDefaultsIfNotSet()
@@ -49,27 +46,10 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('interface')->cannotBeEmpty()->end()
                                 ->scalarNode('controller')->defaultValue(ResourceController::class)->cannotBeEmpty()->end()
                                 ->scalarNode('repository')->cannotBeEmpty()->end()
-                                ->scalarNode('factory')->defaultValue(Factory::class)->end()
-                                ->scalarNode('form')->defaultValue(DefaultResourceType::class)->cannotBeEmpty()->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
             ->end();
-    }
-
-    /**
-     * @param ArrayNodeDefinition $node
-     */
-    private function addDriversSection(ArrayNodeDefinition $node)
-    {
-        $node
-            ->children()
-                ->arrayNode('drivers')
-                    ->defaultValue([SyliusResourceBundle::DRIVER_DOCTRINE_ORM])
-                    ->prototype('enum')->values(SyliusResourceBundle::getAvailableDrivers())->end()
-                ->end()
-            ->end()
-        ;
     }
 }
