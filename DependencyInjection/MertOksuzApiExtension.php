@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class MertOksuzApiExtension extends Extension implements PrependExtensionInterface
+class MertOksuzApiExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -28,26 +28,5 @@ class MertOksuzApiExtension extends Extension implements PrependExtensionInterfa
         $loader->load("services.yml");
 
         $container->setParameter("mertoksuz_api.config", $config);
-    }
-
-    /**
-     * Allow an extension to prepend the extension configurations.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        $configs = $container->getExtensionConfig("framework");
-        $param = $container->getParameter("kernel.project_dir");
-        $default_resource = $configs[0]["router"]["resource"];
-        $resource = str_replace("%kernel.project_dir%", $param, $default_resource);
-
-        $routing = [
-            'test_mert' => ['resource' => '.', 'type' => 'mert_oksuz.api']
-        ];
-
-        $yaml = Yaml::dump($routing);
-
-        file_put_contents($resource, $yaml, FILE_APPEND);
     }
 }

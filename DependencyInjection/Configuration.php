@@ -38,6 +38,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype("array")
                         ->children()
                             ->scalarNode('driver')->defaultValue(MertOksuzApiBundle::DRIVER_DOCTRINE_ORM)->end()
+                            ->scalarNode('identifier')->defaultValue('id')->end()
                             ->arrayNode('classes')
                             ->isRequired()
                             ->addDefaultsIfNotSet()

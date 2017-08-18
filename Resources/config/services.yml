@@ -1,4 +1,23 @@
 services:
-    MertOksuz\ApiBundle\Routing\RouteLoader:
-        arguments: ["@service_container", "@argument_metadata_factory"]
-        tags: [routing.loader]
+    mert_oksuz.route_provider:
+        class: MertOksuz\ApiBundle\Routing\Provider\MertOksuzRouteCollectionProvider
+        arguments: ["%mertoksuz_api.config%"]
+        autowire: true
+
+    MertOksuz\ApiBundle\Routing\ModularRouter:
+        tags:
+            - { name: router, priority: 50 }
+
+    mert_oksuz.registry:
+        class: MertOksuz\ApiBundle\Metadata\Registry
+        public: false
+
+    mert_oksuz.request_configuration_factory:
+        class: MertOksuz\ApiBundle\Controller\RequestConfigurationFactory
+        public: false
+
+    MertOksuz\ApiBundle\Controller\:
+        resource: '../../Controller'
+        arguments: ["@mert_oksuz.registry", "@mert_oksuz.request_configuration_factory", "@doctrine.orm.entity_manager"]
+        public: true
+        tags: ['controller.service_arguments']
