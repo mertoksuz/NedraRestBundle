@@ -7,7 +7,7 @@ ApiBundle creating REST api based on your models. Just give your models and use 
 Step 1: Update composer.json
 
 ```
-$ composer require mertoksuz/api-bundle "1.0"
+composer require mertoksuz/api-bundle "1.0"
 ```
 
 Step 2: Register Classes to `AppKernel`
@@ -37,3 +37,25 @@ mert_oksuz_api:
                 model: AppBundle\Entity\Model`
                 form:  AppBundle\Form\ModelType
 ```
+
+#### Note
+`app.model` is a pattern example. You must define your models with application prefix like `app`
+
+
+## Check Routes
+
+Run that command and debug your router
+```
+bin/console debug:router
+```
+
+You will see auto-generated routings for REST
+```php 
+app_model_index             GET         ANY      ANY    /models/                            
+app_model_create            POST        ANY      ANY    /models/new                         
+app_model_update            PUT|PATCH   ANY      ANY    /models/{id}                        
+app_model_show              GET         ANY      ANY    /models/{id}                        
+app_model_delete            DELETE      ANY      ANY    /models/{id} 
+```
+
+
