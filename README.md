@@ -4,7 +4,7 @@ ApiBundle creating REST api based on your models. Just give your models and use 
 
 ## Get Started
 
-Bundle works on Doctrine based models. Bundle purpose is generate an REST Api in fastest and easy way.
+Bundle works on Doctrine based models. Bundle purpose is generate a REST Api in fastest and easy way.
 
 ## Installation
 
