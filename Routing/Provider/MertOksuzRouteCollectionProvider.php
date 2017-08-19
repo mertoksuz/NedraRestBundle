@@ -41,27 +41,27 @@ final class MertOksuzRouteCollectionProvider implements RouteCollectionProviderI
             $identifier = sprintf('{%s}', $configuration['identifier']);
 
             if (in_array('index', $routesToGenerate)) {
-                $indexRoute = $this->createRoute($rootPath, 'index', ['GET']);
+                $indexRoute = $this->createRoute($rootPath, $configuration, 'index', ['GET']);
                 $routes->add($this->getRouteName($metadata, $configuration, 'index'), $indexRoute);
             }
 
             if (in_array('create', $routesToGenerate)) {
-                $createRoute = $this->createRoute($rootPath . 'new', 'create', ['POST']);
+                $createRoute = $this->createRoute($rootPath . 'new', $configuration, 'create', ['POST']);
                 $routes->add($this->getRouteName($metadata, $configuration, 'create'), $createRoute);
             }
 
             if (in_array('update', $routesToGenerate)) {
-                $updateRoute = $this->createRoute($rootPath . $identifier, 'update', ['PUT', 'PATCH']);
+                $updateRoute = $this->createRoute($rootPath . $identifier, $configuration, 'update', ['PUT', 'PATCH']);
                 $routes->add($this->getRouteName($metadata, $configuration, 'update'), $updateRoute);
             }
 
             if (in_array('show', $routesToGenerate)) {
-                $showRoute = $this->createRoute($rootPath . $identifier, 'show', ['GET']);
+                $showRoute = $this->createRoute($rootPath . $identifier, $configuration, 'show', ['GET']);
                 $routes->add($this->getRouteName($metadata, $configuration, 'show'), $showRoute);
             }
 
             if (in_array('delete', $routesToGenerate)) {
-                $deleteRoute = $this->createRoute($rootPath . $identifier, 'delete', ['DELETE']);
+                $deleteRoute = $this->createRoute($rootPath . $identifier,$configuration,  'delete', ['DELETE']);
                 $routes->add($this->getRouteName($metadata, $configuration, 'delete'), $deleteRoute);
             }
         }
@@ -70,17 +70,25 @@ final class MertOksuzRouteCollectionProvider implements RouteCollectionProviderI
     }
 
     /**
-     * @param string $path
-     * @param string $actionName
+     * @param $path
+     * @param array $configuration
+     * @param $actionName
      * @param array $methods
-     *
      * @return Route
      */
-    private function createRoute($path, $actionName, array $methods)
+    private function createRoute($path, array $configuration, $actionName, array $methods)
     {
         $defaults = [
-            '_controller' => "MertOksuz\ApiBundle\Controller\ResourceController".sprintf(':%sAction', $actionName),
+            '_controller' => $configuration['classes']['controller'].sprintf(':%sAction', $actionName),
         ];
+
+        if ($configuration['classes']['model']) {
+            $defaults["_mertoksuz"]["model"] = $configuration['classes']['model'];
+        }
+
+        if (isset($configuration['classes']['form'])) {
+            $defaults["_mertoksuz"]["form"] = $configuration['classes']['form'];
+        }
 
         return $this->createMainRoute($path, $defaults, [], [], '', [], $methods);
     }

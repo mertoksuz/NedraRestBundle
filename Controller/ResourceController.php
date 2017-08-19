@@ -7,11 +7,20 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use MertOksuz\ApiBundle\Component\MetadataInterface;
 use MertOksuz\ApiBundle\Metadata\RegistryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Class ResourceController
+ * @package MertOksuz\ApiBundle\Controller
+ */
 class ResourceController extends FOSRestController
 {
+    /** @var MetadataInterface */
+    private $metadata;
+
     /** @var RegistryInterface */
     private $registry;
 
@@ -21,27 +30,25 @@ class ResourceController extends FOSRestController
     /** @var RequestConfigurationInterface */
     private $requestConfigurationFactory;
 
+    /** @var RequestFormConfigurationInterface */
+    private $requestFormFactory;
+
     public function __construct(
         RegistryInterface $registry,
         RequestConfigurationInterface $requestConfiguration,
-        EntityManager $entityManager)
+        EntityManager $entityManager,
+        RequestFormConfigurationInterface $requestFormConfiguration
+    )
     {
         $this->registry = $registry;
         $this->requestConfigurationFactory = $requestConfiguration;
         $this->entityManager = $entityManager;
+        $this->requestFormFactory = $requestFormConfiguration;
     }
 
     public function indexAction(Request $request)
     {
-        /** @var MetadataInterface $configuration */
-        $configuration = $this->requestConfigurationFactory->create($this->registry, $request);
-
-        $model = $configuration->getClass("model");
-        $result = $this->entityManager->getRepository($model)->findAll();
-
-        if (!$result) {
-            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $configuration->getHumanizedName()));
-        }
+        $result = $this->findOr404($request);
 
         $view = new View();
         $view->setData($result);
@@ -50,18 +57,65 @@ class ResourceController extends FOSRestController
 
     public function showAction($id, Request $request)
     {
+        $result = $this->findOr404($request, $id);
+
+        $view = new View();
+        $view->setData($result);
+        return $this->handleView($view);
+    }
+
+    public function deleteAction($id, Request $request)
+    {
+        $result = $this->findOr404($request, $id);
+
+        $this->entityManager->remove($result);
+        $this->entityManager->flush();
+
+        $view = new View();
+        $view->setData(null);
+        $view->setStatusCode(Response::HTTP_NO_CONTENT);
+        return $this->handleView($view);
+    }
+
+    public function updateAction($id, Request $request)
+    {
+        $result = $this->findOr404($request, $id);
+
+        /** @var FormInterface $form */
+        $form = $this->requestFormFactory->create($this->metadata, $request, $result);
+
+        $form->handleRequest($request);
+
+        $this->entityManager->flush();
+        $this->entityManager->refresh($result);
+
+        $view = new View();
+        $view->setData($result);
+        return $this->handleView($view);
+    }
+
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return array|null|object
+     */
+    private function findOr404(Request $request, $id = null)
+    {
         /** @var MetadataInterface $configuration */
         $configuration = $this->requestConfigurationFactory->create($this->registry, $request);
+        $this->metadata = $configuration;
 
         $model = $configuration->getClass("model");
-        $result = $this->entityManager->getRepository($model)->find($id);
+        if (!$id) {
+            $result = $this->entityManager->getRepository($model)->findAll();
+        } else {
+            $result = $this->entityManager->getRepository($model)->find($id);
+        }
 
         if (!$result) {
             throw new NotFoundHttpException(sprintf('The "%s" has not been found', $configuration->getHumanizedName()));
         }
 
-        $view = new View();
-        $view->setData($result);
-        return $this->handleView($view);
+        return $result;
     }
 }

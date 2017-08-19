@@ -10,15 +10,11 @@ class RequestConfigurationFactory implements RequestConfigurationInterface
     public function create(RegistryInterface $registry, Request $request)
     {
         $parameters = $request->attributes->all();
-        $aliasFull = $parameters["_route"];
+        $model = $parameters["_mertoksuz"]["model"];
+        $conf = $registry->getByClass($model);
 
-        if (!empty($aliasFull)) {
-            $split = explode("_", $aliasFull);
-            $alias = $split[0].".".$split[1];
-
-            $conf = $registry->get($alias);
-        } else {
-            throw new InvalidArgumentException("Alias ".$aliasFull." not match");
+        if (!$conf) {
+            throw new InvalidArgumentException("Model class not found. !");
         }
 
         return $conf;

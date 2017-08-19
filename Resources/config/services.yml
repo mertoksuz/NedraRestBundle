@@ -16,8 +16,19 @@ services:
         class: MertOksuz\ApiBundle\Controller\RequestConfigurationFactory
         public: false
 
+    mert_oksuz.default_resource_type:
+        class: MertOksuz\ApiBundle\Form\Type\DefaultResourceType
+        arguments: ["@mert_oksuz.registry", "@doctrine.orm.entity_manager"]
+        public: false
+        tags: ['form.type']
+
+    mert_oksuz.request_form_factory:
+        class: MertOksuz\ApiBundle\Controller\RequestFormConfiguration
+        arguments: ["@form.factory", "@mert_oksuz.registry", "@doctrine.orm.entity_manager"]
+        public: false
+
     MertOksuz\ApiBundle\Controller\:
         resource: '../../Controller'
-        arguments: ["@mert_oksuz.registry", "@mert_oksuz.request_configuration_factory", "@doctrine.orm.entity_manager"]
+        arguments: ["@mert_oksuz.registry", "@mert_oksuz.request_configuration_factory", "@doctrine.orm.entity_manager", "@mert_oksuz.request_form_factory"]
         public: true
         tags: ['controller.service_arguments']

@@ -3,6 +3,7 @@
 namespace MertOksuz\ApiBundle\DependencyInjection;
 
 use MertOksuz\ApiBundle\Controller\ResourceController;
+use MertOksuz\ApiBundle\Form\Type\DefaultResourceType;
 use MertOksuz\ApiBundle\MertOksuzApiBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -45,6 +46,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('model')->isRequired()->cannotBeEmpty()->end()
                                 ->scalarNode('interface')->cannotBeEmpty()->end()
+                                ->scalarNode('form')->defaultValue(DefaultResourceType::class)->cannotBeEmpty()->end()
                                 ->scalarNode('controller')->defaultValue(ResourceController::class)->cannotBeEmpty()->end()
                                 ->scalarNode('repository')->cannotBeEmpty()->end()
                             ->end()
