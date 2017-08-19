@@ -27,6 +27,10 @@ final class MertOksuzRouteCollectionProvider implements RouteCollectionProviderI
 
             $routesToGenerate = ['show', 'index', 'create', 'update', 'delete'];
 
+            if (!empty($configuration['only']) && !empty($configuration['except'])) {
+                throw new \InvalidArgumentException('You can configure only one of "except" & "only" options.');
+            }
+
             if (!empty($configuration['only'])) {
                 $routesToGenerate = $configuration['only'];
             }

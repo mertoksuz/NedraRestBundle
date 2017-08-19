@@ -34,7 +34,7 @@ mert_oksuz_api:
     entities:
         app.model:
             classes:
-                model: AppBundle\Entity\Model`
+                model: AppBundle\Entity\Model
                 form:  AppBundle\Form\ModelType
 ```
 
@@ -59,3 +59,21 @@ app_model_delete            DELETE      ANY      ANY    /models/{id}
 ```
 
 
+## Configuration Reference
+
+```yml
+mert_oksuz_api:
+    entities:
+        app.model:
+            identifier: id # you can change {id} to {slug}
+            path: model # you can change /models/ to /cars/
+            except: ['show']
+            only: ['create', 'index']
+            classes:
+                model: AppBundle\Entity\Model
+                form:  AppBundle\Form\ModelType
+```
+
+#### Note
+
+You can use only one of them `except` or `only`
