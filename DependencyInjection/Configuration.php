@@ -1,10 +1,10 @@
 <?php
 
-namespace MertOksuz\ApiBundle\DependencyInjection;
+namespace Nedra\RestBundle\DependencyInjection;
 
-use MertOksuz\ApiBundle\Controller\ResourceController;
-use MertOksuz\ApiBundle\Form\Type\DefaultResourceType;
-use MertOksuz\ApiBundle\MertOksuzApiBundle;
+use Nedra\RestBundle\Controller\ResourceController;
+use Nedra\RestBundle\Form\Type\DefaultResourceType;
+use Nedra\RestBundle\NedraRestBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('mert_oksuz_api');
+        $rootNode = $treeBuilder->root('nedra_rest');
 
         $this->addEntitiesSection($rootNode);
 
@@ -38,7 +38,7 @@ class Configuration implements ConfigurationInterface
                 ->useAttributeAsKey('name')
                     ->prototype("array")
                         ->children()
-                            ->scalarNode('driver')->defaultValue(MertOksuzApiBundle::DRIVER_DOCTRINE_ORM)->end()
+                            ->scalarNode('driver')->defaultValue(NedraRestBundle::DRIVER_DOCTRINE_ORM)->end()
                             ->scalarNode('path')->cannotBeEmpty()->end()
                             ->scalarNode('identifier')->defaultValue('id')->end()
                             ->arrayNode('classes')

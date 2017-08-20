@@ -1,5 +1,5 @@
 <?php
-namespace MertOksuz\ApiBundle\Routing;
+namespace Nedra\RestBundle\Routing;
 
 use Symfony\Component\Routing\RouterInterface;
 

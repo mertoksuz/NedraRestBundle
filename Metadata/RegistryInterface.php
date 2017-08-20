@@ -1,12 +1,12 @@
 <?php
 
-namespace MertOksuz\ApiBundle\Metadata;
+namespace Nedra\RestBundle\Metadata;
 
-use MertOksuz\ApiBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Component\MetadataInterface;
 
 /**
  * Interface RegistryInterface
- * @package MertOksuz\ApiBundle\Metadata
+ * @package Nedra\RestBundle\Metadata
  */
 interface RegistryInterface
 {

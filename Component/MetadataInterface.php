@@ -1,6 +1,6 @@
 <?php
 
-namespace MertOksuz\ApiBundle\Component;
+namespace Nedra\RestBundle\Component;
 
 interface MetadataInterface
 {

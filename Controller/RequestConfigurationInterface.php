@@ -1,7 +1,7 @@
 <?php
-namespace MertOksuz\ApiBundle\Controller;
+namespace Nedra\RestBundle\Controller;
 
-use MertOksuz\ApiBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Metadata\RegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface RequestConfigurationInterface

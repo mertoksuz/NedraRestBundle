@@ -1,4 +1,7 @@
-# Plug & Play RestApiBundle
+[![Build Status](https://travis-ci.org/mertoksuz/RestBundle.svg?branch=master)](https://travis-ci.org/mertoksuz/RestBundle)
+[![Coverage Status](https://coveralls.io/repos/github/mertoksuz/RestBundle/badge.svg?branch=master)](https://coveralls.io/github/mertoksuz/RestBundle?branch=master)
+ 
+# NedraRestBundle
 
 ApiBundle creating REST api based on your models. Just give your models and use your auto-generated endpoints.
 
@@ -11,7 +14,7 @@ Bundle works on Doctrine ORM based models. Bundle purpose is generate a REST Api
 Step 1: Update composer.json
 
 ```
-composer require mertoksuz/api-bundle
+composer require nedra/rest-bundle
 ```
 
 Step 2: Register Classes to `AppKernel`
@@ -21,20 +24,13 @@ Step 2: Register Classes to `AppKernel`
 new FOS\RestBundle\FOSRestBundle(),
 new JMS\SerializerBundle\JMSSerializerBundle($this),
 new Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
-new MertOksuz\ApiBundle\MertOksuzApiBundle(),
+new Nedra\RestBundle\NedraRestBundle(),
 ```
 
-Step 3: Update your `config.yml` for `FOSRestBundle` and `MertOksuzApiBundle`
+Step 3: Update your `config.yml` for `NedraRestBundle`
 
 ```yml
-fos_rest:
-    format_listener:
-        rules:
-            - { path: '^/', priorities: ['json', 'xml'], fallback_format: 'json', prefer_extension: false }
-```
-
-```yml
-mert_oksuz_api:
+nedra_rest:
     entities:
         app.model:
             classes:
@@ -65,7 +61,7 @@ app_model_delete            DELETE      ANY      ANY    /models/{id}
 ## Configuration Reference
 
 ```yml
-mert_oksuz_api:
+nedra_rest:
     entities:
         app.model:
             identifier: id # you can change {id} to {slug}

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MertOksuz\ApiBundle\Routing;
+namespace Nedra\RestBundle\Routing;
 
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

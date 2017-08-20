@@ -1,34 +1,34 @@
 services:
-    mert_oksuz.route_provider:
-        class: MertOksuz\ApiBundle\Routing\Provider\RouteCollectionProvider
-        arguments: ["%mertoksuz_api.config%"]
+    nedra_rest.route_provider:
+        class: Nedra\RestBundle\Routing\Provider\RouteCollectionProvider
+        arguments: ["%nedrarest.config%"]
         autowire: true
 
-    MertOksuz\ApiBundle\Routing\ModularRouter:
+    Nedra\RestBundle\Routing\ModularRouter:
         tags:
             - { name: router, priority: 50 }
 
-    mert_oksuz.registry:
-        class: MertOksuz\ApiBundle\Metadata\Registry
+    nedra_rest.registry:
+        class: Nedra\RestBundle\Metadata\Registry
         public: false
 
-    mert_oksuz.request_configuration_factory:
-        class: MertOksuz\ApiBundle\Controller\RequestConfigurationFactory
+    nedra_rest.request_configuration_factory:
+        class: Nedra\RestBundle\Controller\RequestConfigurationFactory
         public: false
 
-    mert_oksuz.default_resource_type:
-        class: MertOksuz\ApiBundle\Form\Type\DefaultResourceType
-        arguments: ["@mert_oksuz.registry", "@doctrine.orm.entity_manager"]
+    nedra_rest.default_resource_type:
+        class: Nedra\RestBundle\Form\Type\DefaultResourceType
+        arguments: ["@nedra_rest.registry", "@doctrine.orm.entity_manager"]
         public: false
         tags: ['form.type']
 
-    mert_oksuz.request_form_factory:
-        class: MertOksuz\ApiBundle\Controller\RequestFormConfiguration
-        arguments: ["@form.factory", "@mert_oksuz.registry", "@doctrine.orm.entity_manager"]
+    nedra_rest.request_form_factory:
+        class: Nedra\RestBundle\Controller\RequestFormConfiguration
+        arguments: ["@form.factory", "@nedra_rest.registry", "@doctrine.orm.entity_manager"]
         public: false
 
-    MertOksuz\ApiBundle\Controller\:
+    Nedra\RestBundle\Controller\:
         resource: '../../Controller'
-        arguments: ["@mert_oksuz.registry", "@mert_oksuz.request_configuration_factory", "@doctrine.orm.entity_manager", "@mert_oksuz.request_form_factory"]
+        arguments: ["@nedra_rest.registry", "@nedra_rest.request_configuration_factory", "@doctrine.orm.entity_manager", "@nedra_rest.request_form_factory"]
         public: true
         tags: ['controller.service_arguments']

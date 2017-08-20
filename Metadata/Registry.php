@@ -1,8 +1,8 @@
 <?php
-namespace MertOksuz\ApiBundle\Metadata;
+namespace Nedra\RestBundle\Metadata;
 
-use MertOksuz\ApiBundle\Component\Metadata;
-use MertOksuz\ApiBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Component\Metadata;
+use Nedra\RestBundle\Component\MetadataInterface;
 
 final class Registry implements RegistryInterface
 {

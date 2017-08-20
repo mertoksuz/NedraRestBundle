@@ -1,12 +1,12 @@
 <?php
-namespace MertOksuz\ApiBundle\Controller;
+namespace Nedra\RestBundle\Controller;
 
-use MertOksuz\ApiBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Component\MetadataInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface RequestFormConfigurationInterface
- * @package MertOksuz\ApiBundle\Controller
+ * @package Nedra\RestBundle\Controller
  */
 interface RequestFormConfigurationInterface
 {
