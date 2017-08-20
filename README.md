@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mertoksuz/ApiBundle.svg?branch=master)](https://travis-ci.org/mertoksuz/ApiBundle)
 
-# Plug & Play RestApiBundle
+# NedraRestBundle
 
 ApiBundle creating REST api based on your models. Just give your models and use your auto-generated endpoints.
 
