@@ -11,7 +11,7 @@ Bundle works on Doctrine ORM based models. Bundle purpose is generate a REST Api
 Step 1: Update composer.json
 
 ```
-composer require mertoksuz/api-bundle "1.0.2"
+composer require mertoksuz/api-bundle
 ```
 
 Step 2: Register Classes to `AppKernel`
