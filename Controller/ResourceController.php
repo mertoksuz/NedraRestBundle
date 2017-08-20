@@ -1,12 +1,12 @@
 <?php
 
-namespace MertOksuz\ApiBundle\Controller;
+namespace Nedra\RestBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use MertOksuz\ApiBundle\Component\MetadataInterface;
-use MertOksuz\ApiBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\RegistryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ResourceController
- * @package MertOksuz\ApiBundle\Controller
+ * @package Nedra\RestBundle\Controller
  */
 class ResourceController extends FOSRestController
 {

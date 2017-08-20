@@ -1,12 +1,12 @@
 <?php
 
-namespace MertOksuz\ApiBundle\DependencyInjection\Compiler;
+namespace Nedra\RestBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use MertOksuz\ApiBundle\Routing\ModularRouterInterface;
-use MertOksuz\ApiBundle\Routing\RouteCollectionProviderInterface;
+use Nedra\RestBundle\Routing\ModularRouterInterface;
+use Nedra\RestBundle\Routing\RouteCollectionProviderInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInterface

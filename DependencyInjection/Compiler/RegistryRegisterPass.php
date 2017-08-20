@@ -1,5 +1,5 @@
 <?php
-namespace MertOksuz\ApiBundle\DependencyInjection\Compiler;
+namespace Nedra\RestBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -10,8 +10,8 @@ final class RegistryRegisterPass implements CompilerPassInterface
     public function process(ContainerBuilder $containerBuilder)
     {
         try {
-            $resources = $containerBuilder->getParameter('mertoksuz_api.config');
-            $registry = $containerBuilder->findDefinition('mert_oksuz.registry');
+            $resources = $containerBuilder->getParameter('nedrarest.config');
+            $registry = $containerBuilder->findDefinition('nedra_rest.registry');
         } catch (InvalidArgumentException $exception) {
             return ;
         }

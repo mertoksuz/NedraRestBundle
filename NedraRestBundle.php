@@ -1,13 +1,13 @@
 <?php
 
-namespace MertOksuz\ApiBundle;
+namespace Nedra\RestBundle;
 
-use MertOksuz\ApiBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
-use MertOksuz\ApiBundle\DependencyInjection\Compiler\RegistryRegisterPass;
+use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
+use Nedra\RestBundle\DependencyInjection\Compiler\RegistryRegisterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MertOksuzApiBundle extends Bundle
+class NedraRestBundle extends Bundle
 {
     const DRIVER_DOCTRINE_ORM = "doctrine";
 

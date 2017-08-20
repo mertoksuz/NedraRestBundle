@@ -1,12 +1,12 @@
 <?php
-namespace MertOksuz\ApiBundle\Routing\Provider;
+namespace Nedra\RestBundle\Routing\Provider;
 
 use Gedmo\Sluggable\Util\Urlizer;
-use MertOksuz\ApiBundle\Component\Metadata;
-use MertOksuz\ApiBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Component\Metadata;
+use Nedra\RestBundle\Component\MetadataInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use MertOksuz\ApiBundle\Routing\RouteCollectionProviderInterface;
+use Nedra\RestBundle\Routing\RouteCollectionProviderInterface;
 
 final class RouteCollectionProvider implements RouteCollectionProviderInterface
 {
@@ -87,11 +87,11 @@ final class RouteCollectionProvider implements RouteCollectionProviderInterface
         ];
 
         if ($configuration['classes']['model']) {
-            $defaults["_mertoksuz"]["model"] = $configuration['classes']['model'];
+            $defaults["_nedrarest"]["model"] = $configuration['classes']['model'];
         }
 
         if (isset($configuration['classes']['form'])) {
-            $defaults["_mertoksuz"]["form"] = $configuration['classes']['form'];
+            $defaults["_nedrarest"]["form"] = $configuration['classes']['form'];
         }
 
         return $this->createMainRoute($path, $defaults, [], [], '', [], $methods);

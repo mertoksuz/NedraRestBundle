@@ -1,5 +1,5 @@
 <?php
-namespace MertOksuz\ApiBundle\Component;
+namespace Nedra\RestBundle\Component;
 
 use Doctrine\Common\Inflector\Inflector;
 

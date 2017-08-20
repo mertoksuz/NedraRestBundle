@@ -1,10 +1,10 @@
 <?php
-namespace MertOksuz\ApiBundle\Form\Type;
+namespace Nedra\RestBundle\Form\Type;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use MertOksuz\ApiBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Metadata\RegistryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -72,6 +72,6 @@ final class DefaultResourceType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'mertoksuz_resource';
+        return 'nedrarest_resource';
     }
 }

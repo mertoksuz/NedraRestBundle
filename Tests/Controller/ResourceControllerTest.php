@@ -1,5 +1,5 @@
 <?php
-namespace MertOksuz\ApiBundle\Tests\Controller;
+namespace Nedra\RestBundle\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 

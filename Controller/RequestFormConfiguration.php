@@ -1,16 +1,16 @@
 <?php
-namespace MertOksuz\ApiBundle\Controller;
+namespace Nedra\RestBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use MertOksuz\ApiBundle\Component\MetadataInterface;
-use MertOksuz\ApiBundle\Form\Type\DefaultResourceType;
-use MertOksuz\ApiBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Form\Type\DefaultResourceType;
+use Nedra\RestBundle\Metadata\RegistryInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class RequestFormConfiguration
- * @package MertOksuz\ApiBundle\Controller
+ * @package Nedra\RestBundle\Controller
  */
 class RequestFormConfiguration implements RequestFormConfigurationInterface
 {
@@ -33,7 +33,7 @@ class RequestFormConfiguration implements RequestFormConfigurationInterface
     public function create(MetadataInterface $metadata, Request $request, $resource)
     {
         $parameters = $request->attributes->all();
-        $formClass = $parameters["_mertoksuz"]["form"];
+        $formClass = $parameters["_nedrarest"]["form"];
 
         $formOptions = [
             'data_class' => $metadata->getClass("model")

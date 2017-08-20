@@ -1,5 +1,5 @@
 <?php
-namespace MertOksuz\ApiBundle\Routing;
+namespace Nedra\RestBundle\Routing;
 
 interface RouteCollectionProviderInterface
 {

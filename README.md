@@ -13,7 +13,7 @@ Bundle works on Doctrine ORM based models. Bundle purpose is generate a REST Api
 Step 1: Update composer.json
 
 ```
-composer require mertoksuz/api-bundle
+composer require nedra/rest-bundle
 ```
 
 Step 2: Register Classes to `AppKernel`
@@ -23,10 +23,10 @@ Step 2: Register Classes to `AppKernel`
 new FOS\RestBundle\FOSRestBundle(),
 new JMS\SerializerBundle\JMSSerializerBundle($this),
 new Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
-new MertOksuz\ApiBundle\MertOksuzApiBundle(),
+new Nedra\RestBundle\NedraRestBundle(),
 ```
 
-Step 3: Update your `config.yml` for `FOSRestBundle` and `MertOksuzApiBundle`
+Step 3: Update your `config.yml` for `FOSRestBundle` and `NedraRestBundle`
 
 ```yml
 fos_rest:
@@ -36,7 +36,7 @@ fos_rest:
 ```
 
 ```yml
-mert_oksuz_api:
+nedra_rest:
     entities:
         app.model:
             classes:
@@ -67,7 +67,7 @@ app_model_delete            DELETE      ANY      ANY    /models/{id}
 ## Configuration Reference
 
 ```yml
-mert_oksuz_api:
+nedra_rest:
     entities:
         app.model:
             identifier: id # you can change {id} to {slug}

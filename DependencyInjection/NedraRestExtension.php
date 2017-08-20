@@ -1,20 +1,18 @@
 <?php
 
-namespace MertOksuz\ApiBundle\DependencyInjection;
+namespace Nedra\RestBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * This is the class that loads and manages your bundle configuration.
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class MertOksuzApiExtension extends Extension
+class NedraRestExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -27,6 +25,6 @@ class MertOksuzApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load("services.yml");
 
-        $container->setParameter("mertoksuz_api.config", $config);
+        $container->setParameter("nedrarest.config", $config);
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "mertoksuz/api-bundle",
+  "name": "nedra/rest-bundle",
   "description": "Generates a REST api based on your entities",
   "type": "symfony-bundle",
   "keywords" : [
@@ -35,8 +35,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "MertOksuz\\ApiBundle\\": "",
-      "MertOksuz\\ApiBundle\\Tests\\": "Tests/"
+      "Nedra\\RestBundle\\": "",
+      "Nedra\\RestBundle\\Tests\\": "Tests/"
     }
   }
 }
