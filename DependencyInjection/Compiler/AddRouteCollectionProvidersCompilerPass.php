@@ -29,7 +29,7 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
     ) {
         $collectorDefinition = $this->getByType($containerBuilder, $collectorType);
         foreach ($containerBuilder->getDefinitions() as $name => $definition) {
-            if (! is_subclass_of($definition->getClass(), $collectedType)) {
+            if (!is_subclass_of($definition->getClass(), $collectedType)) {
                 continue;
             }
 

@@ -26,14 +26,7 @@ new Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
 new Nedra\RestBundle\NedraRestBundle(),
 ```
 
-Step 3: Update your `config.yml` for `FOSRestBundle` and `NedraRestBundle`
-
-```yml
-fos_rest:
-    format_listener:
-        rules:
-            - { path: '^/', priorities: ['json', 'xml'], fallback_format: 'json', prefer_extension: false }
-```
+Step 3: Update your `config.yml` for `NedraRestBundle`
 
 ```yml
 nedra_rest:
