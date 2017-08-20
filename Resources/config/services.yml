@@ -1,6 +1,6 @@
 services:
     mert_oksuz.route_provider:
-        class: MertOksuz\ApiBundle\Routing\Provider\MertOksuzRouteCollectionProvider
+        class: MertOksuz\ApiBundle\Routing\Provider\RouteCollectionProvider
         arguments: ["%mertoksuz_api.config%"]
         autowire: true
 

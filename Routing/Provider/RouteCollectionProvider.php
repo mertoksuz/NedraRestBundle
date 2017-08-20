@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use MertOksuz\ApiBundle\Routing\RouteCollectionProviderInterface;
 
-final class MertOksuzRouteCollectionProvider implements RouteCollectionProviderInterface
+final class RouteCollectionProvider implements RouteCollectionProviderInterface
 {
     private $configuration;
 
