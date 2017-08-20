@@ -5,9 +5,8 @@ namespace MertOksuz\ApiBundle\Metadata;
 use MertOksuz\ApiBundle\Component\MetadataInterface;
 
 /**
- * Interface for the registry of all resources.
- *
- * @author Paweł Jędrzejewski <pawel@sylius.org>
+ * Interface RegistryInterface
+ * @package MertOksuz\ApiBundle\Metadata
  */
 interface RegistryInterface
 {
