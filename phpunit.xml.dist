@@ -12,8 +12,10 @@
         <whitelist>
             <directory>.</directory>
             <exclude>
-                <directory>Resources</directory>
-                <directory>Tests</directory>
+                <directory>./*/*Bundle/Resources</directory>
+                <directory>./*/*Bundle/Tests</directory>
+                <directory>./*/Bundle/*Bundle/Resources</directory>
+                <directory>./*/Bundle/*Bundle/Tests</directory>
                 <directory>vendor</directory>
             </exclude>
         </whitelist>
