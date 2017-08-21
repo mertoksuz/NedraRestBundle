@@ -5,29 +5,23 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="./vendor/autoload.php"
+         bootstrap="../../../vendor/autoload.php"
         >
-
-    <filter>
-        <whitelist>
-            <directory>.</directory>
-            <exclude>
-                <directory>./*/*Bundle/Resources</directory>
-                <directory>./*/*Bundle/Tests</directory>
-                <directory>./*/Bundle/*Bundle/Resources</directory>
-                <directory>./*/Bundle/*Bundle/Tests</directory>
-                <directory>vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
 
     <testsuites>
         <testsuite name="Api Bundle Test Suite">
             <directory>Tests</directory>
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>.</directory>
+            <exclude>
+                <directory>Tests</directory>
+                <directory>vendor</directory>
+                <directory>Resources</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

@@ -11,6 +11,11 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInterface
 {
+    /**
+     * You can update container before compile.
+     *
+     * @param ContainerBuilder $containerBuilder
+     */
     public function process(ContainerBuilder $containerBuilder)
     {
         $this->loadCollectorWithType(
@@ -21,6 +26,12 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
         );
     }
 
+    /**
+     * @param ContainerBuilder $containerBuilder
+     * @param $collectorType
+     * @param $collectedType
+     * @param $setterMethod
+     */
     private function loadCollectorWithType(
         ContainerBuilder $containerBuilder,
         $collectorType,
@@ -37,6 +48,11 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
         }
     }
 
+    /**
+     * @param ContainerBuilder $containerBuilder
+     * @param $type
+     * @return \Symfony\Component\DependencyInjection\Definition
+     */
     private function getByType(ContainerBuilder $containerBuilder, $type)
     {
         foreach ($containerBuilder->getDefinitions() as $definition) {

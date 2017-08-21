@@ -8,8 +8,15 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Nedra\RestBundle\Routing\RouteCollectionProviderInterface;
 
+/**
+ * Class RouteCollectionProvider
+ * @package Nedra\RestBundle\Routing\Provider
+ */
 final class RouteCollectionProvider implements RouteCollectionProviderInterface
 {
+    /**
+     * @var array
+     */
     private $configuration;
 
     public function __construct(array $configs)

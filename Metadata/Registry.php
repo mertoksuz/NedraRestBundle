@@ -4,6 +4,10 @@ namespace Nedra\RestBundle\Metadata;
 use Nedra\RestBundle\Component\Metadata;
 use Nedra\RestBundle\Component\MetadataInterface;
 
+/**
+ * Class Registry
+ * @package Nedra\RestBundle\Metadata
+ */
 final class Registry implements RegistryInterface
 {
     /**

@@ -9,6 +9,10 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Class ModularRouter
+ * @package Nedra\RestBundle\Routing
+ */
 final class ModularRouter implements ModularRouterInterface
 {
     /**
@@ -36,16 +40,25 @@ final class ModularRouter implements ModularRouterInterface
         $this->routeCollection = new RouteCollection;
     }
 
+    /**
+     * @param RouteCollectionProviderInterface $routeCollectionProvider
+     */
     public function addRouteCollectionProvider(RouteCollectionProviderInterface $routeCollectionProvider)
     {
         $this->routeCollection->addCollection($routeCollectionProvider->getRouteCollection());
     }
 
+    /**
+     * @return RouteCollection
+     */
     public function getRouteCollection()
     {
         return $this->routeCollection;
     }
 
+    /**
+     * @param RequestContext $requestContext
+     */
     public function setContext(RequestContext $requestContext)
     {
         $this->requestContext = $requestContext;
@@ -79,6 +92,9 @@ final class ModularRouter implements ModularRouterInterface
         return '...';
     }
 
+    /**
+     * @return UrlGenerator|UrlGeneratorInterface
+     */
     private function getUrlGenerator()
     {
         if ($this->urlGenerator) {
@@ -88,6 +104,9 @@ final class ModularRouter implements ModularRouterInterface
         return $this->urlGenerator = new UrlGenerator($this->getRouteCollection(), $this->requestContext);
     }
 
+    /**
+     * @return UrlMatcher|UrlMatcherInterface
+     */
     private function getUrlMatcher()
     {
         if ($this->urlMatcher) {
