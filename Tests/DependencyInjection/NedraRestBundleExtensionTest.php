@@ -2,9 +2,11 @@
 namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
+use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
 use PHPUnit\Framework\TestCase;
+
 
 class ResourceControllerTest extends TestCase
 {
@@ -38,4 +40,35 @@ class ResourceControllerTest extends TestCase
         $this->assertTrue($container->hasExtension("cmf_routing"));
     }
 
+    public function test_if_nedra_rest_active_then_create_routes_by_given_entities()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    'app.book' => [
+                        'only'  => ['index'],
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Test',
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+        $container->registerExtension($ext);
+        $bundle = new NedraRestBundle();
+        $bundle->build($container);
+
+        $routeProvider = $container->get("nedra_rest.route_provider");
+        $routes = $routeProvider->getRouteCollection();
+
+        if ($routes) {
+            $this->assertArrayHasKey("app_book_index", $routes->all());
+        }
+    }
 }

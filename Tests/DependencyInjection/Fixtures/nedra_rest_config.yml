@@ -1,9 +1,0 @@
-imports:
-    - { resource: services.yml }
-
-nedra_rest:
-    active: true
-    entities:
-        app.book:
-            classes:
-                model: AppBundle\Entity\Book

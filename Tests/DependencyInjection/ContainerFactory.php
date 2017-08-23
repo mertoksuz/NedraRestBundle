@@ -3,8 +3,11 @@ namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -35,6 +38,15 @@ class ContainerFactory
         $bundle->build($container);
 
         $container->compile();
+        return $container;
+    }
+
+    /**
+     * @return ContainerBuilder
+     */
+    public static function createDummyContainer()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array('kernel.debug' => false)));
         return $container;
     }
 }
