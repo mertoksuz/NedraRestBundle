@@ -2,6 +2,7 @@
 
 namespace Nedra\RestBundle\DependencyInjection\Compiler;
 
+use Nedra\RestBundle\NedraRestBundle;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,6 +19,11 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
      */
     public function process(ContainerBuilder $containerBuilder)
     {
+
+        if (!$containerBuilder->has(NedraRestBundle::REGISTRY_ID)) {
+            return;
+        }
+
         $this->loadCollectorWithType(
             $containerBuilder,
             ModularRouterInterface::class,
