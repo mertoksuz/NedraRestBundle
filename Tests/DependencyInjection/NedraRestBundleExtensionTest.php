@@ -46,7 +46,6 @@ class ResourceControllerTest extends TestCase
             'nedra_rest' => [
                 'entities' => [
                     'app.book' => [
-                        'only'  => ['index'],
                         'classes' => [
                             'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Test',
                         ]
@@ -69,6 +68,10 @@ class ResourceControllerTest extends TestCase
 
         if ($routes) {
             $this->assertArrayHasKey("app_book_index", $routes->all());
+            $this->assertArrayHasKey("app_book_create", $routes->all());
+            $this->assertArrayHasKey("app_book_update", $routes->all());
+            $this->assertArrayHasKey("app_book_show", $routes->all());
+            $this->assertArrayHasKey("app_book_delete", $routes->all());
         }
     }
 }
