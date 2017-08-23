@@ -3,7 +3,7 @@
  
 # NedraRestBundle
 
-ApiBundle creating REST api based on your models. Just give your models and use your auto-generated endpoints.
+NedraRestBundle creates automatically a REST API based on your models. Just give your models and use your auto-generated endpoints.
 
 ## Get Started
 
@@ -31,6 +31,7 @@ Step 3: Update your `config.yml` for `NedraRestBundle`
 
 ```yml
 nedra_rest:
+    active: true # this is default value, you can disable the bundle with set to false
     entities:
         app.model:
             classes:
