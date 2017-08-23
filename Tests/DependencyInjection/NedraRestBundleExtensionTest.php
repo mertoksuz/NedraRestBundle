@@ -8,11 +8,14 @@ use Nedra\RestBundle\NedraRestBundle;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-
-class ResourceControllerTest extends KernelTestCase
+class ResourceControllerTest extends TestCase
 {
+    /**
+     * @var \Symfony\Component\HttpKernel\Kernel
+     */
+    protected $kernel;
+
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -28,8 +31,10 @@ class ResourceControllerTest extends KernelTestCase
      */
     public function setUp()
     {
-        self::bootKernel();
-        $this->container = self::$kernel->getContainer();
+        $this->kernel = new \AppKernel('test', true);
+        $this->kernel->boot();
+
+        $this->container = $this->kernel->getContainer();
         $this->entityManager = $this->container->get('doctrine')->getManager();
 
         parent::setUp();
