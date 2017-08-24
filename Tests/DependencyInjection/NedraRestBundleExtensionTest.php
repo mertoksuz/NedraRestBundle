@@ -2,6 +2,7 @@
 namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
+use FOS\RestBundle\FOSRestBundle;
 use Nedra\RestBundle\Component\MetadataInterface;
 use Nedra\RestBundle\Controller\ResourceController;
 use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
@@ -221,6 +222,40 @@ class ResourceControllerTest extends TestCase
         }
     }
 
+    public function test_fos_rest_configuration()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "app.book" => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+
+        $fos_config = [
+            'fos_rest' => ['format_listener'=>[]]
+        ];
+        $fosext = new FOSRestExtension();
+        $fosext->load($fos_config, $container);
+        $container->registerExtension($fosext);
+        $container->prependExtensionConfig("fos_rest", $fos_config);
+
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+        $container->registerExtension($ext);
+
+        $ext->prepend($container);
+
+        $fos_rest_config = $container->getExtensionConfig('fos_rest');
+        $this->assertArrayHasKey("rules", $fos_rest_config[0]['format_listener']);
+    }
     public function test_if_no_classes_defined_then_error()
     {
         $config = [
