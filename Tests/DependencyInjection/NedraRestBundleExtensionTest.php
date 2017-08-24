@@ -226,7 +226,7 @@ class ResourceControllerTest extends TestCase
 
     }
 
-    public function test_router_provider()
+    public function test_modular_routing_class()
     {
 
         $config = [
@@ -250,24 +250,20 @@ class ResourceControllerTest extends TestCase
 
         $ext = new NedraRestExtension();
         $ext->load($config, $container);
-        $container->registerExtension($ext);
-
-        $container->register("form.factory", FormFactory::class)->addArgument($this->container->get("form.registry"))->addArgument("form.resolved_type_factory");
-
-        $locator = new FileLocator(__DIR__ . '/Fixtures');
-        $loader = new YamlFileLoader($container, $locator);
-        $loader->load('services.yml');
 
         $taggedServices = $container->findTaggedServiceIds('router');
+
+        if (!$taggedServices) {
+            $this->assertFalse(true);
+        }
 
         foreach ($taggedServices as $id => $tags) {
             $modularRouting = new $id;
             if ($modularRouting instanceof ModularRouterInterface) {
                 $modularRouting->addRouteCollectionProvider(new RouteCollectionProvider($config['nedra_rest']));
-                $routeCollection = $modularRouting->getRouteCollection()->get('app_book_index');
-                if ($modularRouting && $routeCollection) {
-                    $this->assertTrue(true);
-                }
+                $this->assertArrayHasKey("app_book_index", $modularRouting->getRouteCollection()->all());
+            } else {
+                $this->assertFalse(false);
             }
         }
     }
