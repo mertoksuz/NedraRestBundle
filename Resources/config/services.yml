@@ -24,7 +24,7 @@ services:
 
     nedra_rest.request_form_factory:
         class: Nedra\RestBundle\Controller\RequestFormConfiguration
-        arguments: ["@form.factory", "@nedra_rest.registry", "@doctrine.orm.entity_manager"]
+        arguments: ["@form.factory", "@nedra_rest.registry"]
         public: false
 
     Nedra\RestBundle\Controller\:

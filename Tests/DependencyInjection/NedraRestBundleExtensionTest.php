@@ -2,7 +2,7 @@
 namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
-use Nedra\RestBundle\Controller\ResourceController;
+use Nedra\RestBundle\Component\MetadataInterface;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
@@ -11,6 +11,29 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ResourceControllerTest extends TestCase
 {
+    /**
+     * @var \Symfony\Component\HttpKernel\Kernel
+     */
+    protected $kernel;
+
+    /**
+     * @var \Symfony\Component\DependencyInjection\Container
+     */
+    protected $container;
+
+    /**
+     * @return null
+     */
+    public function setUp()
+    {
+        $this->kernel = new AppKernel('test', true);
+        $this->kernel->boot();
+
+        $this->container = $this->kernel->getContainer();
+
+        parent::setUp();
+    }
+
     public function test_no_nedra_rest_bundle_when_active_is_false()
     {
         $container = ContainerFactory::createContainer("disabled.yml");
@@ -41,10 +64,8 @@ class ResourceControllerTest extends TestCase
         $this->assertTrue($container->hasExtension("cmf_routing"));
     }
 
-    public function test_resource_controller()
+    public function test_if_nedra_rest_configured_and_request_has_meta_data()
     {
-        $this->assertTrue(true, 'This test needs a check.');
-        /*
         $config = [
             'nedra_rest' => [
                 'entities' => [
@@ -71,8 +92,7 @@ class ResourceControllerTest extends TestCase
 
         $container->register("nedra_rest.form_factory", "Nedra\RestBundle\Controller\RequestFormConfiguration")
             ->addArgument($this->container->get("form.factory"))
-            ->addArgument($registry)
-            ->addArgument($this->entityManager);
+            ->addArgument($registry);
 
 
         $registry->addFromAliasAndConfiguration("app.book",
@@ -90,12 +110,8 @@ class ResourceControllerTest extends TestCase
             ]
         ]);
 
-        $controller = new ResourceController($registry, $requestFactory, $this->entityManager, $container->get("nedra_rest.form_factory"));
-
-        if ($controller) {
-            $this->assertTrue(true);
-        }
-        */
+        $model = $requestFactory->create($registry, $req);
+        $this->assertTrue(($model instanceof MetadataInterface)?true:false);
     }
 
     public function test_if_nedra_rest_active_then_create_routes_by_given_entities()
