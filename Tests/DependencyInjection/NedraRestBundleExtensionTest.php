@@ -3,11 +3,21 @@ namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
 use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Controller\ResourceController;
+use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
+use Nedra\RestBundle\DependencyInjection\Compiler\RegistryRegisterPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
+use Nedra\RestBundle\Form\Type\DefaultResourceType;
 use Nedra\RestBundle\NedraRestBundle;
+use Nedra\RestBundle\Routing\ModularRouter;
+use Nedra\RestBundle\Routing\ModularRouterInterface;
+use Nedra\RestBundle\Routing\Provider\RouteCollectionProvider;
 use Psr\Log\InvalidArgumentException;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 class ResourceControllerTest extends TestCase
@@ -177,6 +187,88 @@ class ResourceControllerTest extends TestCase
             $bundle->build($container);
         } catch (InvalidArgumentException $exception) {
             $this->assertTrue($exception->getMessage());
+        }
+    }
+
+    public function test_registry_compiler_pass()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    'app.book' => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book',
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+        $container->registerExtension($ext);
+
+        $container->register("form.factory", FormFactory::class)->addArgument($this->container->get("form.registry"))->addArgument("form.resolved_type_factory");
+
+        $locator = new FileLocator(__DIR__ . '/Fixtures');
+        $loader = new YamlFileLoader($container, $locator);
+        $loader->load('services.yml');
+
+        $pass = new RegistryRegisterPass();
+        $pass->process($container);
+
+        $registry = $container->get("nedra_rest.registry")->get("app.book");
+
+        $this->assertEquals("Nedra\RestBundle\Tests\DependencyInjection\Models\Book", $registry->getClass("model"));
+
+    }
+
+    public function test_router_provider()
+    {
+
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    'app.book' => [
+                        'driver' => 'doctrine/orm',
+                        'identifier' => 'id',
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book',
+                            'controller' => ResourceController::class,
+                            'form' => DefaultResourceType::class
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+        $container->registerExtension($ext);
+
+        $container->register("form.factory", FormFactory::class)->addArgument($this->container->get("form.registry"))->addArgument("form.resolved_type_factory");
+
+        $locator = new FileLocator(__DIR__ . '/Fixtures');
+        $loader = new YamlFileLoader($container, $locator);
+        $loader->load('services.yml');
+
+        $taggedServices = $container->findTaggedServiceIds('router');
+
+        foreach ($taggedServices as $id => $tags) {
+            $modularRouting = new $id;
+            if ($modularRouting instanceof ModularRouterInterface) {
+                $modularRouting->addRouteCollectionProvider(new RouteCollectionProvider($config['nedra_rest']));
+                $routeCollection = $modularRouting->getRouteCollection()->get('app_book_index');
+                if ($modularRouting && $routeCollection) {
+                    $this->assertTrue(true);
+                }
+            }
         }
     }
 }
