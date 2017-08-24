@@ -8,6 +8,7 @@ use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCom
 use Nedra\RestBundle\DependencyInjection\Compiler\RegistryRegisterPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\Form\Type\DefaultResourceType;
+use Nedra\RestBundle\Metadata\RegistryInterface;
 use Nedra\RestBundle\NedraRestBundle;
 use Nedra\RestBundle\Routing\ModularRouter;
 use Nedra\RestBundle\Routing\ModularRouterInterface;
@@ -15,6 +16,7 @@ use Nedra\RestBundle\Routing\Provider\RouteCollectionProvider;
 use Psr\Log\InvalidArgumentException;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Form\FormFactory;
@@ -82,7 +84,7 @@ class ResourceControllerTest extends TestCase
                 'entities' => [
                     'app.book' => [
                         'classes' => [
-                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Test',
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book',
                         ]
                     ]
                 ]
@@ -94,7 +96,6 @@ class ResourceControllerTest extends TestCase
 
         $ext = new NedraRestExtension();
         $ext->load($config, $container);
-        $container->registerExtension($ext);
         $bundle = new NedraRestBundle();
         $bundle->build($container);
 
@@ -144,7 +145,6 @@ class ResourceControllerTest extends TestCase
 
         $ext = new NedraRestExtension();
         $ext->load($config, $container);
-        $container->registerExtension($ext);
         $bundle = new NedraRestBundle();
         $bundle->build($container);
 
@@ -158,6 +158,48 @@ class ResourceControllerTest extends TestCase
             $this->assertArrayHasKey("app_book_show", $routes->all());
             $this->assertArrayHasKey("app_book_delete", $routes->all());
         }
+    }
+
+    public function test_if_no_classes_defined_then_error()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "app.book" => []
+                ]
+            ]
+        ];
+
+        try {
+            $container = ContainerFactory::createDummyContainer();
+            $container->setParameter("nedrarest.config", $config);
+            $ext = new NedraRestExtension();
+            $ext->load($config, $container);
+        } catch (InvalidConfigurationException $exception) {
+            $this->assertEquals("The child node \"classes\" at path \"nedra_rest.entities.app.book\" must be configured.", $exception->getMessage());
+        }
+    }
+
+    public function test_if_no_alias_defined_then_error()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+
+        try {
+            $container->get("nedra_rest.registry")->get("app.book");
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertEquals("Resource \"app.book\" does not exist.", $exception->getMessage());
+        }
+
     }
 
     public function test_if_only_and_except_options_defined_then_error()
@@ -182,7 +224,6 @@ class ResourceControllerTest extends TestCase
 
             $ext = new NedraRestExtension();
             $ext->load($config, $container);
-            $container->registerExtension($ext);
             $bundle = new NedraRestBundle();
             $bundle->build($container);
         } catch (InvalidArgumentException $exception) {
