@@ -160,6 +160,67 @@ class ResourceControllerTest extends TestCase
         }
     }
 
+    public function test_metadata()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "app.book" => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+
+        $pass = new RegistryRegisterPass();
+        $pass->process($container);
+
+        /** @var RegistryInterface $registry */
+        $metadata = $container->get("nedra_rest.registry")->getAll();
+
+        $this->assertArrayHasKey("app.book", $metadata);
+
+    }
+    public function test_if_class_defined_but_not_in_registry()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "app.book" => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $container = ContainerFactory::createDummyContainer();
+            $container->setParameter("nedrarest.config", $config);
+            $ext = new NedraRestExtension();
+            $ext->load($config, $container);
+
+            $pass = new RegistryRegisterPass();
+            $pass->process($container);
+
+            /** @var RegistryInterface $registry */
+            $registry = $container->get("nedra_rest.registry")->getByClass("Nedra\RestBundle\Tests\DependencyInjection\Models\Flower");
+
+
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertEquals("Resource with model class \"Nedra\RestBundle\Tests\DependencyInjection\Models\Flower\" does not exist.", $exception->getMessage());
+        }
+    }
+
     public function test_if_no_classes_defined_then_error()
     {
         $config = [
