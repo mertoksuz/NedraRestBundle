@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/mertoksuz/RestBundle.svg?branch=master)](https://travis-ci.org/mertoksuz/RestBundle)
-[![Coverage Status](https://coveralls.io/repos/github/mertoksuz/RestBundle/badge.svg?branch=master)](https://coveralls.io/github/mertoksuz/RestBundle?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/mertoksuz/RestBundle/badge.svg)](https://coveralls.io/github/mertoksuz/RestBundle)
  
 # NedraRestBundle
 
