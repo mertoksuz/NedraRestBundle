@@ -35,6 +35,7 @@
     }
   ],
   "autoload": {
+    "files": ["app/AppKernel.php"],
     "psr-4": {
       "Nedra\\RestBundle\\": "",
       "Nedra\\RestBundle\\Tests\\": "Tests/"
