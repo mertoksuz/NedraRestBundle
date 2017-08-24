@@ -80,7 +80,7 @@ final class ModularRouter implements ModularRouterInterface
      * @param string $pathinfo
      * @return array[]
      */
-    public function match($pathinfo): array
+    public function match($pathinfo)
     {
         return $this->getUrlMatcher()
             ->match($pathinfo);
