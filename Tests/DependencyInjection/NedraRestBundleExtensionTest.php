@@ -167,6 +167,7 @@ class ResourceControllerTest extends TestCase
             'nedra_rest' => [
                 'entities' => [
                     "app.book" => [
+                        "driver" => "doctrine/orm",
                         'classes' => [
                             'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
                         ]
@@ -184,12 +185,53 @@ class ResourceControllerTest extends TestCase
         $pass = new RegistryRegisterPass();
         $pass->process($container);
 
-        /** @var RegistryInterface $registry */
-        $metadata = $container->get("nedra_rest.registry")->getAll();
+        /** @var MetadataInterface $metadata */
+        $metadata = $container->get("nedra_rest.registry")->get("app.book");
 
-        $this->assertArrayHasKey("app.book", $metadata);
+        $this->assertEquals("book", $metadata->getHumanizedName());
+        $this->assertEquals("doctrine/orm", $metadata->getDriver());
+        $this->assertArrayHasKey("identifier", $metadata->getParameters());
+        $this->assertEquals("id", $metadata->getParameter("identifier"));
+        $this->assertTrue(($metadata->hasParameter("identifier"))?true:false);
+        $this->assertEquals("app.test_service.book", $metadata->getServiceId("test_service"));
+        $this->assertEquals("app.book.test_permission", $metadata->getPermissionCode("test_permission"));
 
+        $parsedAlias = $metadata::fromAliasAndConfiguration("app.book", $metadata->getParameters());
+        $this->assertInstanceOf(MetadataInterface::class, $parsedAlias);
     }
+
+
+    public function test_if_alias_format_is_wrong()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "appbook" => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $container = ContainerFactory::createDummyContainer();
+            $container->setParameter("nedrarest.config", $config);
+            $ext = new NedraRestExtension();
+            $ext->load($config, $container);
+
+            $pass = new RegistryRegisterPass();
+            $pass->process($container);
+
+            /** @var RegistryInterface $registry */
+            $metadata = $container->get("nedra_rest.registry")->getAll();
+
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertEquals('Invalid alias supplied, it should conform to the following format "<applicationName>.<name>".', $exception->getMessage());
+        }
+    }
+
     public function test_if_class_defined_but_not_in_registry()
     {
         $config = [
@@ -244,6 +286,7 @@ class ResourceControllerTest extends TestCase
             'fos_rest' => [
                 'format_listener' => [
                     'rules' => [
+                        'host' => null
                     ]
                 ]
             ]
@@ -252,7 +295,7 @@ class ResourceControllerTest extends TestCase
         $fosext = new FOSRestExtension();
         $fosext->load($fos_config, $container);
         $container->registerExtension($fosext);
-        $container->prependExtensionConfig("fos_rest", $fos_config);
+        $container->prependExtensionConfig("fos_rest", $fos_config['fos_rest']);
 
         $ext = new NedraRestExtension();
         $ext->load($config, $container);
