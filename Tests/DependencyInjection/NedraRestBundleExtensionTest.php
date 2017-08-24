@@ -5,6 +5,7 @@ use FOS\RestBundle\DependencyInjection\FOSRestExtension;
 use Nedra\RestBundle\Component\MetadataInterface;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
+use Psr\Log\InvalidArgumentException;
 use Symfony\Cmf\Bundle\RoutingBundle\DependencyInjection\CmfRoutingExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,7 +122,7 @@ class ResourceControllerTest extends TestCase
                 'entities' => [
                     'app.book' => [
                         'classes' => [
-                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Test',
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book',
                         ]
                     ]
                 ]
@@ -146,6 +147,36 @@ class ResourceControllerTest extends TestCase
             $this->assertArrayHasKey("app_book_update", $routes->all());
             $this->assertArrayHasKey("app_book_show", $routes->all());
             $this->assertArrayHasKey("app_book_delete", $routes->all());
+        }
+    }
+
+    public function test_if_only_and_except_options_defined_then_error()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    'app.book' => [
+                        'only' => ['index'],
+                        'except' => ['show'],
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book',
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $container = ContainerFactory::createDummyContainer();
+            $container->setParameter("nedrarest.config", $config);
+
+            $ext = new NedraRestExtension();
+            $ext->load($config, $container);
+            $container->registerExtension($ext);
+            $bundle = new NedraRestBundle();
+            $bundle->build($container);
+        } catch (InvalidArgumentException $exception) {
+            $this->assertTrue($exception->getMessage());
         }
     }
 }
