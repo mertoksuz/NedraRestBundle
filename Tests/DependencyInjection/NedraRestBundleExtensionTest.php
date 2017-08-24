@@ -222,7 +222,8 @@ class ResourceControllerTest extends TestCase
         }
     }
 
-    public function test_fos_rest_configuration()
+
+    public function test_fos_rest_if_fos_configured()
     {
         $config = [
             'nedra_rest' => [
@@ -240,7 +241,50 @@ class ResourceControllerTest extends TestCase
         $container->setParameter("nedrarest.config", $config);
 
         $fos_config = [
-            'fos_rest' => ['format_listener'=>[]]
+            'fos_rest' => [
+                'format_listener' => [
+                    'rules' => [
+                    ]
+                ]
+            ]
+        ];
+
+        $fosext = new FOSRestExtension();
+        $fosext->load($fos_config, $container);
+        $container->registerExtension($fosext);
+        $container->prependExtensionConfig("fos_rest", $fos_config);
+
+        $ext = new NedraRestExtension();
+        $ext->load($config, $container);
+        $container->registerExtension($ext);
+
+        $ext->prepend($container);
+
+        $fos_rest_config = $container->getExtensionConfig('fos_rest');
+        $this->assertArrayHasKey("path", $fos_rest_config[0]['format_listener']['rules']);
+    }
+
+    public function test_fos_rest_if_fos_not_configured()
+    {
+        $config = [
+            'nedra_rest' => [
+                'entities' => [
+                    "app.book" => [
+                        'classes' => [
+                            'model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = ContainerFactory::createDummyContainer();
+        $container->setParameter("nedrarest.config", $config);
+
+        $fos_config = [
+            'fos_rest' => [
+                'format_listener' => []
+            ]
         ];
         $fosext = new FOSRestExtension();
         $fosext->load($fos_config, $container);
@@ -256,6 +300,7 @@ class ResourceControllerTest extends TestCase
         $fos_rest_config = $container->getExtensionConfig('fos_rest');
         $this->assertArrayHasKey("rules", $fos_rest_config[0]['format_listener']);
     }
+
     public function test_if_no_classes_defined_then_error()
     {
         $config = [
