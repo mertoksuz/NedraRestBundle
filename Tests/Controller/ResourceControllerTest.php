@@ -20,6 +20,7 @@ use Nedra\RestBundle\Tests\DependencyInjection\Models\Book;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ResourceControllerTest extends TestCase
 {
@@ -82,7 +83,54 @@ class ResourceControllerTest extends TestCase
         $this->assertInstanceOf('Nedra\RestBundle\Tests\DependencyInjection\Models\Book', $result);
     }
 
-    private function getConstructor()
+    public function test_show_action()
+    {
+        $controller = $this->getConstructor('find');
+
+        $book = new Book();
+        $book->setTitle('Test Book');
+        $book->setDescription('i am description of book 1');
+        $book->setId(1);
+
+        $view = new View();
+        $view->setData($book);
+
+        $viewHandler = $this->getMockBuilder(ViewHandler::class)->disableOriginalConstructor()->getMock();
+        $viewHandler->expects($this->any())->method('handle')->willReturn($view->getData());
+        $controller->setViewHandler($viewHandler);
+
+        $request = new Request();
+        $request->attributes->set('_nedrarest', ['model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book']);
+        $result = $controller->showAction(1, $request);
+
+        $this->assertEquals("Test Book",  $result->getTitle());
+    }
+
+    public function test_delete_action()
+    {
+        $controller = $this->getConstructor('find');
+
+        $book = new Book();
+        $book->setTitle('Test Book');
+        $book->setDescription('i am description of book 1');
+        $book->setId(1);
+
+        $view = new View();
+        $view->setData(null);
+        $view->setStatusCode(Response::HTTP_NO_CONTENT);
+
+        $viewHandler = $this->getMockBuilder(ViewHandler::class)->disableOriginalConstructor()->getMock();
+        $viewHandler->expects($this->any())->method('handle')->willReturn($view->getData());
+        $controller->setViewHandler($viewHandler);
+
+        $request = new Request();
+        $request->attributes->set('_nedrarest', ['model' => 'Nedra\RestBundle\Tests\DependencyInjection\Models\Book']);
+        $result = $controller->deleteAction(1, $request);
+
+        $this->assertEquals(NULL,  $result);
+    }
+
+    private function getConstructor($method = 'findAll')
     {
         $book = new Book();
         $book->setTitle('Test Book');
@@ -122,9 +170,10 @@ class ResourceControllerTest extends TestCase
         $this->formFactory = $container->get("nedra_rest.request_form_factory");
 
         $bookRepository = $this->getMockBuilder(ObjectRepository::class)->setMethods(['find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])->getMock();
-        $bookRepository->expects($this->any())->method('findAll')->willReturn($book);
 
-        $this->em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository'])->getMock();
+        $bookRepository->expects($this->any())->method($method)->willReturn($book);
+
+        $this->em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush', 'refresh'])->getMock();
         $this->em ->expects($this->any())->method("getRepository")->willReturn($bookRepository);
 
         $controller = new ResourceController($this->registry, $this->requestFactory, $this->em, $this->formFactory);
