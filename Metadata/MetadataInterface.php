@@ -1,6 +1,6 @@
 <?php
 
-namespace Nedra\RestBundle\Component;
+namespace Nedra\RestBundle\Metadata;
 
 interface MetadataInterface
 {

@@ -1,7 +1,7 @@
 <?php
 namespace Nedra\RestBundle\Controller;
 
-use Nedra\RestBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface RequestConfigurationInterface

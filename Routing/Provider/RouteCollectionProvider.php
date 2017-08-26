@@ -2,8 +2,8 @@
 namespace Nedra\RestBundle\Routing\Provider;
 
 use Gedmo\Sluggable\Util\Urlizer;
-use Nedra\RestBundle\Component\Metadata;
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\Metadata;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Nedra\RestBundle\Routing\RouteCollectionProviderInterface;
