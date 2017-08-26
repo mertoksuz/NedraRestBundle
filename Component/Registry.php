@@ -1,8 +1,8 @@
 <?php
 namespace Nedra\RestBundle\Component;
 
-use Nedra\RestBundle\Component\Metadata;
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\Metadata;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 
 /**
  * Class Registry

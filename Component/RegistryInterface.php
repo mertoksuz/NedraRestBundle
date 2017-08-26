@@ -2,7 +2,7 @@
 
 namespace Nedra\RestBundle\Component;
 
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 
 /**
  * Interface RegistryInterface
