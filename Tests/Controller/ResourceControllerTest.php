@@ -13,7 +13,7 @@ use Nedra\RestBundle\Controller\RequestFormConfigurationInterface;
 use Nedra\RestBundle\Controller\ResourceController;
 use Nedra\RestBundle\DependencyInjection\Compiler\RegistryRegisterPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
-use Nedra\RestBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\RegistryInterface;
 use Nedra\RestBundle\Tests\DependencyInjection\AppKernel;
 use Nedra\RestBundle\Tests\DependencyInjection\ContainerFactory;
 use Nedra\RestBundle\Tests\DependencyInjection\Models\Book;

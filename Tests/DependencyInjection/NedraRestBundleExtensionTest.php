@@ -3,13 +3,13 @@ namespace Nedra\RestBundle\Tests\DependencyInjection;
 
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
 use FOS\RestBundle\FOSRestBundle;
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 use Nedra\RestBundle\Controller\ResourceController;
 use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
 use Nedra\RestBundle\DependencyInjection\Compiler\RegistryRegisterPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\Form\Type\DefaultResourceType;
-use Nedra\RestBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\RegistryInterface;
 use Nedra\RestBundle\NedraRestBundle;
 use Nedra\RestBundle\Routing\ModularRouter;
 use Nedra\RestBundle\Routing\ModularRouterInterface;

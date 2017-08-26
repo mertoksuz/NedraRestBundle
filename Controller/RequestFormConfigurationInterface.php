@@ -1,7 +1,7 @@
 <?php
 namespace Nedra\RestBundle\Controller;
 
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

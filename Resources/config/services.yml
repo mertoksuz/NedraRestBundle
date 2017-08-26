@@ -9,7 +9,7 @@ services:
             - { name: router, priority: 50 }
 
     nedra_rest.registry:
-        class: Nedra\RestBundle\Metadata\Registry
+        class: Nedra\RestBundle\Component\Registry
         public: false
 
     nedra_rest.request_configuration_factory:

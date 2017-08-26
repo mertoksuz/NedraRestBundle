@@ -1,5 +1,5 @@
 <?php
-namespace Nedra\RestBundle\Component;
+namespace Nedra\RestBundle\Metadata;
 
 use Doctrine\Common\Inflector\Inflector;
 

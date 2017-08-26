@@ -2,9 +2,9 @@
 namespace Nedra\RestBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use Nedra\RestBundle\Component\MetadataInterface;
+use Nedra\RestBundle\Metadata\MetadataInterface;
 use Nedra\RestBundle\Form\Type\DefaultResourceType;
-use Nedra\RestBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -4,7 +4,7 @@ namespace Nedra\RestBundle\Form\Type;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Nedra\RestBundle\Metadata\RegistryInterface;
+use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 

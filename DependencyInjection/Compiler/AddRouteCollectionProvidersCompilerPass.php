@@ -24,7 +24,7 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
             return;
         }
 
-        $this->loadCollectorWithType(
+        $this->initiateRouteCollectionLoaderWithProviderType(
             $containerBuilder,
             ModularRouterInterface::class,
             RouteCollectionProviderInterface::class,
@@ -34,19 +34,19 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
 
     /**
      * @param ContainerBuilder $containerBuilder
-     * @param $collectorType
-     * @param $collectedType
+     * @param $routeCollector
+     * @param $routeProvider
      * @param $setterMethod
      */
-    private function loadCollectorWithType(
+    private function initiateRouteCollectionLoaderWithProviderType(
         ContainerBuilder $containerBuilder,
-        $collectorType,
-        $collectedType,
+        $routeCollector,
+        $routeProvider,
         $setterMethod
     ) {
-        $collectorDefinition = $this->getByType($containerBuilder, $collectorType);
+        $collectorDefinition = $this->getByRouteProvider($containerBuilder, $routeCollector);
         foreach ($containerBuilder->getDefinitions() as $name => $definition) {
-            if (!is_subclass_of($definition->getClass(), $collectedType)) {
+            if (!is_subclass_of($definition->getClass(), $routeProvider)) {
                 continue;
             }
 
@@ -56,19 +56,19 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
 
     /**
      * @param ContainerBuilder $containerBuilder
-     * @param $type
+     * @param $routeProvider
      * @return \Symfony\Component\DependencyInjection\Definition
      */
-    private function getByType(ContainerBuilder $containerBuilder, $type)
+    private function getByRouteProvider(ContainerBuilder $containerBuilder, $routeProvider)
     {
         foreach ($containerBuilder->getDefinitions() as $definition) {
-            if (is_a($definition->getClass(), $type, true)) {
+            if (is_a($definition->getClass(), $routeProvider, true)) {
                 return $definition;
             }
         }
 
         throw new InvalidArgumentException(
-            sprintf('Definition for type "%s" was not found.', $type)
+            sprintf('Definition for type "%s" was not found.', $routeProvider)
         );
     }
 }
