@@ -3,7 +3,7 @@
   "description": "Generates a REST api based on your entities",
   "type": "symfony-bundle",
   "keywords" : [
-    "symfony based api bundle"
+    "symfony, rest, api, esb"
   ],
   "license" : [
     "MIT"
