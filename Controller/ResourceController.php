@@ -5,9 +5,11 @@ namespace Nedra\RestBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
+use Metadata\ClassMetadata;
 use Nedra\RestBundle\Metadata\MetadataInterface;
 use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,32 +20,45 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ResourceController extends FOSRestController
 {
-    /** @var MetadataInterface */
-    private $metadata;
-
-    /** @var RegistryInterface */
-    private $registry;
-
     /** @var EntityManager */
     private $entityManager;
-
-    /** @var RequestConfigurationInterface */
-    private $requestConfigurationFactory;
 
     /** @var RequestFormConfigurationInterface */
     private $requestFormFactory;
 
-    public function __construct(
-        RegistryInterface $registry,
-        RequestConfigurationInterface $requestConfiguration,
-        EntityManager $entityManager,
-        RequestFormConfigurationInterface $requestFormConfiguration
-    )
+    /** @var \Doctrine\ORM\Mapping\ClassMetadata */
+    private $classMetaData;
+
+    /**
+     * @param RegistryInterface $registry
+     */
+    public function setRegistry($registry)
     {
         $this->registry = $registry;
-        $this->requestConfigurationFactory = $requestConfiguration;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function setEntityManager($entityManager)
+    {
         $this->entityManager = $entityManager;
-        $this->requestFormFactory = $requestFormConfiguration;
+    }
+
+    /**
+     * @param RequestConfigurationInterface $requestConfigurationFactory
+     */
+    public function setRequestConfigurationFactory($requestConfigurationFactory)
+    {
+        $this->requestConfigurationFactory = $requestConfigurationFactory;
+    }
+
+    /**
+     * @param RequestFormConfigurationInterface $requestFormFactory
+     */
+    public function setRequestFormFactory($requestFormFactory)
+    {
+        $this->requestFormFactory = $requestFormFactory;
     }
 
     public function indexAction(Request $request)
@@ -99,13 +114,10 @@ class ResourceController extends FOSRestController
      * @param null $id
      * @return array|null|object
      */
-    private function findOr404(Request $request, $id = null)
+    public function findOr404(Request $request, $id = null)
     {
-        /** @var MetadataInterface $configuration */
-        $configuration = $this->requestConfigurationFactory->create($this->registry, $request);
-        $this->metadata = $configuration;
+        $model = $request->attributes->get("_nedrarest_model");
 
-        $model = $configuration->getClass("model");
         if (!$id) {
             $result = $this->entityManager->getRepository($model)->findAll();
         } else {
@@ -113,7 +125,7 @@ class ResourceController extends FOSRestController
         }
 
         if (!$result) {
-            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $configuration->getHumanizedName()));
+            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $model));
         }
 
         return $result;

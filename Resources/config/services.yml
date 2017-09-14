@@ -29,6 +29,12 @@ services:
 
     Nedra\RestBundle\Controller\:
         resource: '../../Controller'
-        arguments: ["@nedra_rest.registry", "@nedra_rest.request_configuration_factory", "@doctrine.orm.entity_manager", "@nedra_rest.request_form_factory"]
+
+        calls:
+            - [method: "setRegistry", arguments: ["@nedra_rest.registry"]]
+            - [method: "setEntityManager", arguments: ["@nedra_rest.request_configuration_factory"]]
+            - [method: "setRequestConfigurationFactory", arguments: ["@doctrine.orm.entity_manager"]]
+            - [method: "setRequestFormFactory", arguments: ["@nedra_rest.request_form_factory"]]
+
         public: true
         tags: ['controller.service_arguments']

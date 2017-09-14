@@ -3,14 +3,14 @@ namespace Nedra\RestBundle\Controller;
 
 use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class RequestConfigurationFactory implements RequestConfigurationInterface
 {
-    public function create(RegistryInterface $registry, Request $request)
+    public function create(RegistryInterface $registry, ParameterBag $parameterBag)
     {
-        $parameters = $request->attributes->all();
-        $model = $parameters["_nedrarest"]["model"];
+        $model = $parameterBag->get("_nedrarest")["model"];
         $conf = $registry->getByClass($model);
 
         if (!$conf) {
