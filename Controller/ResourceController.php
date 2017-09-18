@@ -30,11 +30,11 @@ class ResourceController extends FOSRestController
     private $classMetaData;
 
     /**
-     * @param RegistryInterface $registry
+     * @param \Doctrine\ORM\Mapping\ClassMetadata $classMetaData
      */
-    public function setRegistry($registry)
+    public function setClassMetaData($classMetaData)
     {
-        $this->registry = $registry;
+        $this->classMetaData = $classMetaData;
     }
 
     /**
@@ -43,14 +43,6 @@ class ResourceController extends FOSRestController
     public function setEntityManager($entityManager)
     {
         $this->entityManager = $entityManager;
-    }
-
-    /**
-     * @param RequestConfigurationInterface $requestConfigurationFactory
-     */
-    public function setRequestConfigurationFactory($requestConfigurationFactory)
-    {
-        $this->requestConfigurationFactory = $requestConfigurationFactory;
     }
 
     /**
@@ -63,10 +55,12 @@ class ResourceController extends FOSRestController
 
     public function indexAction(Request $request)
     {
-        $result = $this->findOr404($request);
+        $result = $this->findAllOr404($request);
 
         $view = new View();
         $view->setData($result);
+        $view->setFormat('json');
+
         return $this->handleView($view);
     }
 
@@ -117,12 +111,19 @@ class ResourceController extends FOSRestController
     public function findOr404(Request $request, $id = null)
     {
         $model = $request->attributes->get("_nedrarest_model");
+        $result = $this->entityManager->getRepository($model)->find($id);
 
-        if (!$id) {
-            $result = $this->entityManager->getRepository($model)->findAll();
-        } else {
-            $result = $this->entityManager->getRepository($model)->find($id);
+        if (!$result) {
+            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $model));
         }
+
+        return $result;
+    }
+
+    public function findAllOr404(Request $request)
+    {
+        $model = $request->attributes->get("_nedrarest_model");
+        $result = $this->entityManager->getRepository($model)->findAll();
 
         if (!$result) {
             throw new NotFoundHttpException(sprintf('The "%s" has not been found', $model));
