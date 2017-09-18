@@ -27,11 +27,15 @@ class ResourceControllerTest extends TestCase
     private $serializer;
     private $templating;
     private $requestStack;
+    private $symserializer;
 
     public function setUp()
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $this->serializer = $this->getMockBuilder('FOS\RestBundle\Serializer\Serializer')->disableOriginalConstructor()->setMethods(['serialize', 'deserialize'])->getMock();
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $this->symserializer = new \Symfony\Component\Serializer\Serializer($normalizers, $encoders);
         $this->templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
         $this->requestStack = new RequestStack();
 
@@ -107,32 +111,13 @@ class ResourceControllerTest extends TestCase
 
         $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
 
-        $viewHandler->registerHandler('json', function() {
-            $encoders = array(new XmlEncoder(), new JsonEncoder());
-            $normalizers = array(new ObjectNormalizer());
-            $serializer = new \Symfony\Component\Serializer\Serializer($normalizers, $encoders);
-            return $serializer->serialize($this->getTestEntities(), 'json');
+        $viewHandler->registerHandler('json', function($handler, $view) {
+            return $this->symserializer->serialize($view->getData(), 'json');
         });
 
         $controller->setViewHandler($viewHandler);
         $this->assertEquals('[{"id":1,"title":"My Title","description":"My Description"},{"id":2,"title":"My Title 1","description":"My Description 1"}]', $controller->indexAction($request));
 
-    }
-
-    private function createViewHandler($formats = null, $failedValidationCode = Response::HTTP_BAD_REQUEST, $emptyContentCode = Response::HTTP_NO_CONTENT, $serializeNull = false, $forceRedirects = null, $defaultEngine = 'twig')
-    {
-        return new ViewHandler(
-            $this->router,
-            $this->serializer,
-            $this->templating,
-            $this->requestStack,
-            $formats,
-            $failedValidationCode,
-            $emptyContentCode,
-            $serializeNull,
-            $forceRedirects,
-            $defaultEngine
-        );
     }
 
     /**
@@ -341,5 +326,21 @@ class ResourceControllerTest extends TestCase
         $request->attributes = $parameterBag;
 
         return $request;
+    }
+
+    private function createViewHandler($formats = null, $failedValidationCode = Response::HTTP_BAD_REQUEST, $emptyContentCode = Response::HTTP_NO_CONTENT, $serializeNull = false, $forceRedirects = null, $defaultEngine = 'twig')
+    {
+        return new ViewHandler(
+            $this->router,
+            $this->serializer,
+            $this->templating,
+            $this->requestStack,
+            $formats,
+            $failedValidationCode,
+            $emptyContentCode,
+            $serializeNull,
+            $forceRedirects,
+            $defaultEngine
+        );
     }
 }
