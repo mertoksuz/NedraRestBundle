@@ -4,6 +4,7 @@ namespace Nedra\RestBundle\Tests\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use function foo\func;
 use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Tests\View\ViewHandlerTest;
 use FOS\RestBundle\View\View;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -27,15 +29,11 @@ class ResourceControllerTest extends TestCase
     private $serializer;
     private $templating;
     private $requestStack;
-    private $symserializer;
 
     public function setUp()
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $this->serializer = $this->getMockBuilder('FOS\RestBundle\Serializer\Serializer')->disableOriginalConstructor()->setMethods(['serialize', 'deserialize'])->getMock();
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer());
-        $this->symserializer = new \Symfony\Component\Serializer\Serializer($normalizers, $encoders);
         $this->templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
         $this->requestStack = new RequestStack();
 
@@ -49,18 +47,7 @@ class ResourceControllerTest extends TestCase
     public function test_find_or_404_fail()
     {
         $controller = new ResourceController();
-
-        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->setMethods(['find', 'findAll'])->getMock();
-
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository'])->getMock();
-        $entityManager->expects($this->any())->method('getRepository')->willReturn($repository);
-
-        $controller->setEntityManager($entityManager);
-
-        $parameterBag = $this->getParameterBag();
-
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $request->attributes = $parameterBag;
+        $request = $this->buildRequestWithFind(null, $controller);
         $controller->findOr404($request);
     }
 
@@ -77,9 +64,9 @@ class ResourceControllerTest extends TestCase
     {
         $controller = new ResourceController();
 
-        $entity = $this->getTestEntity();
-        $request = $this->getFindAllConfig($controller);
-        $this->assertEquals($entity, $controller->findAllOr404($request));
+        $entities = $this->getTestEntities();
+        $request = $this->buildRequestWithFindAll($controller);
+        $this->assertEquals($entities, $controller->findAllOr404($request));
     }
 
     /**
@@ -90,15 +77,7 @@ class ResourceControllerTest extends TestCase
     {
         $controller = new ResourceController();
 
-        $repository = $this->findAllByEntity(null);
-
-        $entityManager = $this->getEntityManager($repository);
-        $controller->setEntityManager($entityManager);
-
-        $parameterBag = $this->getParameterBag();
-
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $request->attributes = $parameterBag;
+        $request = $this->buildRequestWithFindAll($controller, null);
         $controller->findAllOr404($request);
     }
 
@@ -106,18 +85,17 @@ class ResourceControllerTest extends TestCase
     {
         $controller = new ResourceController();
 
-        $request = $this->getFindAllConfig($controller);
-        $this->requestStack->push($request);
+        $request = $this->buildRequestWithFindAll($controller);
 
         $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $serializer = $this->getSerializer();
 
-        $viewHandler->registerHandler('json', function($handler, $view) {
-            return $this->symserializer->serialize($view->getData(), 'json');
+        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
+            return $serializer->serialize($view->getData(), 'json');
         });
 
         $controller->setViewHandler($viewHandler);
         $this->assertEquals('[{"id":1,"title":"My Title","description":"My Description"},{"id":2,"title":"My Title 1","description":"My Description 1"}]', $controller->indexAction($request));
-
     }
 
     /**
@@ -127,21 +105,12 @@ class ResourceControllerTest extends TestCase
     public function test_index_action_fail()
     {
         $controller = new ResourceController();
-
         $entity = null;
 
-        $request = $this->getFindAllConfig($controller, null);
-
-        $serializer = $this->getSerializer();
-        $jsonData = $serializer->serialize($entity, 'json');
-
-        $response = $this->getResponse($jsonData, 200);
-
-        $viewHandler = $this->getMockBuilder(ViewHandler::class)->disableOriginalConstructor()->setMethods(['handle'])->getMock();
-        $viewHandler->expects($this->any())->method('handle')->willReturn($response->getContent());
+        $request = $this->buildRequestWithFindAll($controller, null);
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
 
         $controller->setViewHandler($viewHandler);
-
         $controller->indexAction($request);
     }
 
@@ -151,20 +120,22 @@ class ResourceControllerTest extends TestCase
         $entity = $this->getTestEntity();
 
         $request = $this->buildRequestWithFind($entity, $controller);
-
         $serializer = $this->getSerializer();
-        $jsonData = $serializer->serialize($entity, 'json');
 
-        $response = $this->getResponse($jsonData, 200);
-
-        $viewHandler = $this->getMockBuilder(ViewHandler::class)->disableOriginalConstructor()->setMethods(['handle'])->getMock();
-        $viewHandler->expects($this->any())->method('handle')->willReturn($response->getContent());
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
+            return $serializer->serialize($view->getData(), 'json');
+        });
 
         $controller->setViewHandler($viewHandler);
 
         $this->assertEquals('{"id":1,"title":"My Title","description":"My Description"}', $controller->showAction($entity->getId(), $request));
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedExceptionMessage Not Found
+     */
     public function test_show_action_fail()
     {
         $controller = new ResourceController();
@@ -176,10 +147,23 @@ class ResourceControllerTest extends TestCase
         $viewHandler->expects($this->any())->method('handle')->willThrowException(new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Not Found'));
 
         $controller->setViewHandler($viewHandler);
-
         $controller->showAction(3, $request);
     }
 
+    public function test_delete_action()
+    {
+        $controller = new ResourceController();
+        $entity = $this->getTestEntity();
+        $request = $this->buildRequestWithFind($entity, $controller);
+
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $viewHandler->registerHandler('json', function($handler, $view) {
+            return $view->getData();
+        });
+        $controller->setViewHandler($viewHandler);
+
+        $this->assertEquals(null, $controller->deleteAction($entity->getId(), $request));
+    }
 
     /**
      * @return ParameterBag
@@ -195,12 +179,14 @@ class ResourceControllerTest extends TestCase
 
     /**
      * @param $entity
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function findByEntity($entity)
     {
         $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->setMethods(['find', 'findAll'])->getMock();
         $repository->expects($this->any())->method('find')->willReturn($entity);
+
         return $repository;
     }
 
@@ -216,17 +202,21 @@ class ResourceControllerTest extends TestCase
 
         $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->setMethods(['find', 'findAll'])->getMock();
         $repository->expects($this->any())->method('findAll')->willReturn($entity);
+
         return $repository;
     }
 
     /**
      * @param $repository
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getEntityManager($repository)
+    private function getEntityManager($repository, $remove = null)
     {
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository'])->getMock();
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush'])->getMock();
         $entityManager->expects($this->any())->method('getRepository')->willReturn($repository);
+        $entityManager->expects($this->any())->method('remove')->willReturn($remove);
+
         return $entityManager;
     }
 
@@ -235,24 +225,12 @@ class ResourceControllerTest extends TestCase
      */
     private function getSerializer()
     {
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer());
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
 
         $serializer = new \Symfony\Component\Serializer\Serializer($normalizers, $encoders);
-        return $serializer;
-    }
 
-    /**
-     * @param $jsonData
-     * @param $statusCode
-     * @return Response
-     */
-    private function getResponse($jsonData, $statusCode)
-    {
-        $response = new Response();
-        $response->setStatusCode($statusCode);
-        $response->setContent($jsonData);
-        return $response;
+        return $serializer;
     }
 
     /**
@@ -264,6 +242,7 @@ class ResourceControllerTest extends TestCase
         $entity->setTitle('My Title');
         $entity->setDescription('My Description');
         $entity->setId(1);
+
         return $entity;
     }
 
@@ -292,9 +271,10 @@ class ResourceControllerTest extends TestCase
 
     /**
      * @param $controller
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getFindAllConfig($controller, $return = true)
+    private function buildRequestWithFindAll($controller, $return = true)
     {
         $repository = $this->findAllByEntity($return);
         $entityManager = $this->getEntityManager($repository);
@@ -304,6 +284,7 @@ class ResourceControllerTest extends TestCase
         $parameterBag = $this->getParameterBag();
         $request = new Request();
         $request->attributes = $parameterBag;
+        $this->requestStack->push($request);
 
         return $request;
     }
@@ -311,19 +292,20 @@ class ResourceControllerTest extends TestCase
     /**
      * @param $entity
      * @param $controller
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @return Request
      */
-    private function buildRequestWithFind($entity, $controller)
+    private function buildRequestWithFind($entity, $controller, $remove = null)
     {
         $repository = $this->findByEntity($entity);
 
-        $entityManager = $this->getEntityManager($repository);
+        $entityManager = $this->getEntityManager($repository, $remove);
         $controller->setEntityManager($entityManager);
 
         $parameterBag = $this->getParameterBag();
-
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request = new Request();
         $request->attributes = $parameterBag;
+        $this->requestStack->push($request);
 
         return $request;
     }

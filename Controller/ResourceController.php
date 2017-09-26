@@ -70,6 +70,7 @@ class ResourceController extends FOSRestController
 
         $view = new View();
         $view->setData($result);
+        $view->setFormat('json');
         return $this->handleView($view);
     }
 
@@ -82,6 +83,7 @@ class ResourceController extends FOSRestController
 
         $view = new View();
         $view->setData(null);
+        $view->setFormat('json');
         $view->setStatusCode(Response::HTTP_NO_CONTENT);
         return $this->handleView($view);
     }
@@ -91,7 +93,7 @@ class ResourceController extends FOSRestController
         $result = $this->findOr404($request, $id);
 
         /** @var FormInterface $form */
-        $form = $this->requestFormFactory->create($this->metadata, $request, $result);
+        $form = $this->requestFormFactory->create($this->classMetaData, $request, $result);
 
         $form->handleRequest($request);
 

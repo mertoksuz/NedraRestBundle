@@ -27,13 +27,13 @@ class RequestFormConfiguration implements RequestFormConfigurationInterface
         $this->registry = $registry;
     }
 
-    public function create(MetadataInterface $metadata, Request $request, $resource)
+    public function create(\Doctrine\ORM\Mapping\ClassMetadata $metadata, Request $request, $resource)
     {
         $parameters = $request->attributes->all();
         $formClass = $parameters["_nedrarest"]["form"];
 
         $formOptions = [
-            'data_class' => $metadata->getClass("model")
+            'data_class' => $metadata->fullyQualifiedClassName($formClass)
         ];
 
         return $this->formFactory->createNamed('', $formClass, $resource, array_merge($formOptions, ['method' => $request->getMethod(), 'csrf_protection' => false]));
