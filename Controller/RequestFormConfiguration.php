@@ -18,14 +18,9 @@ class RequestFormConfiguration implements RequestFormConfigurationInterface
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    /** @var RegistryInterface */
-    private $registry;
-
-
-    public function __construct(FormFactoryInterface $formFactory, RegistryInterface $registry)
+    public function __construct(FormFactoryInterface $formFactory)
     {
         $this->formFactory = $formFactory;
-        $this->registry = $registry;
     }
 
     public function create(Request $request, $resource)

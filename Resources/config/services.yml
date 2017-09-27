@@ -23,7 +23,7 @@ services:
 
     nedra_rest.request_form_factory:
         class: Nedra\RestBundle\Controller\RequestFormConfiguration
-        arguments: ["@form.factory", "@nedra_rest.registry"]
+        arguments: ["@form.factory"]
         public: false
 
     Nedra\RestBundle\Controller\:
