@@ -18,7 +18,6 @@ services:
 
     nedra_rest.default_resource_type:
         class: Nedra\RestBundle\Form\Type\DefaultResourceType
-        arguments: ["@nedra_rest.registry", "@doctrine.orm.entity_manager"]
         public: false
         tags: ['form.type']
 
@@ -31,8 +30,6 @@ services:
         resource: '../../Controller'
 
         calls:
-            - [method: "setRegistry", arguments: ["@nedra_rest.registry"]]
-            - [method: "setEntityManager", arguments: ["@nedra_rest.request_configuration_factory"]]
             - [method: "setRequestConfigurationFactory", arguments: ["@doctrine.orm.entity_manager"]]
             - [method: "setRequestFormFactory", arguments: ["@nedra_rest.request_form_factory"]]
 

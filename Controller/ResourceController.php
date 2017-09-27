@@ -91,7 +91,7 @@ class ResourceController extends FOSRestController
         $result = $this->findOr404($request, $id);
 
         /** @var FormInterface $form */
-        $form = $this->requestFormFactory->create($this->classMetaData, $request, $result);
+        $form = $this->requestFormFactory->create($request, $result);
 
         $form->handleRequest($request);
 

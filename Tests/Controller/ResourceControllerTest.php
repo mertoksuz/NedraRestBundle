@@ -191,9 +191,6 @@ class ResourceControllerTest extends TestCase
         $formFactory = $this->getFormFactory($entity);
         $controller->setRequestFormFactory($formFactory);
 
-        $classMetadata = new ClassMetadata(get_class($entity));
-        $controller->setClassMetaData($classMetadata);
-
         $this->assertEquals('{"id":1,"title":"New Title","description":"My Description"}', $controller->updateAction($entity->getId(), $request));
     }
 
