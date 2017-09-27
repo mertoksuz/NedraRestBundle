@@ -9,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 
-final class DefaultResourceType extends AbstractType
+class DefaultResourceType extends AbstractType
 {
     /** @var RegistryInterface */
     private $metadataRegistry;

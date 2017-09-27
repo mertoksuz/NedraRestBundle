@@ -5,11 +5,7 @@ namespace Nedra\RestBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use Metadata\ClassMetadata;
-use Nedra\RestBundle\Metadata\MetadataInterface;
-use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -71,6 +67,7 @@ class ResourceController extends FOSRestController
         $view = new View();
         $view->setData($result);
         $view->setFormat('json');
+
         return $this->handleView($view);
     }
 
@@ -85,6 +82,7 @@ class ResourceController extends FOSRestController
         $view->setData(null);
         $view->setFormat('json');
         $view->setStatusCode(Response::HTTP_NO_CONTENT);
+
         return $this->handleView($view);
     }
 
@@ -101,13 +99,16 @@ class ResourceController extends FOSRestController
         $this->entityManager->refresh($result);
 
         $view = new View();
+        $view->setFormat('json');
         $view->setData($result);
+
         return $this->handleView($view);
     }
 
     /**
      * @param Request $request
-     * @param null $id
+     * @param null    $id
+     *
      * @return array|null|object
      */
     public function findOr404(Request $request, $id = null)

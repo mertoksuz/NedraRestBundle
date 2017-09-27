@@ -4,21 +4,17 @@ namespace Nedra\RestBundle\Tests\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use function foo\func;
-use FOS\RestBundle\Context\Context;
-use FOS\RestBundle\Tests\View\ViewHandlerTest;
-use FOS\RestBundle\View\View;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use FOS\RestBundle\View\ViewHandler;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
+use Nedra\RestBundle\Controller\RequestFormConfigurationInterface;
 use Nedra\RestBundle\Controller\ResourceController;
+use Nedra\RestBundle\Form\Type\DefaultResourceType;
 use Nedra\RestBundle\Tests\DependencyInjection\Models\Book;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -26,8 +22,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ResourceControllerTest extends TestCase
 {
     private $router;
+
     private $serializer;
+
     private $templating;
+
     private $requestStack;
 
     public function setUp()
@@ -88,11 +87,7 @@ class ResourceControllerTest extends TestCase
         $request = $this->buildRequestWithFindAll($controller);
 
         $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
-        $serializer = $this->getSerializer();
-
-        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
-            return $serializer->serialize($view->getData(), 'json');
-        });
+        $this->jsonHandler($viewHandler);
 
         $controller->setViewHandler($viewHandler);
         $this->assertEquals('[{"id":1,"title":"My Title","description":"My Description"},{"id":2,"title":"My Title 1","description":"My Description 1"}]', $controller->indexAction($request));
@@ -123,9 +118,7 @@ class ResourceControllerTest extends TestCase
         $serializer = $this->getSerializer();
 
         $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
-        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
-            return $serializer->serialize($view->getData(), 'json');
-        });
+        $this->jsonHandler($viewHandler);
 
         $controller->setViewHandler($viewHandler);
 
@@ -157,12 +150,51 @@ class ResourceControllerTest extends TestCase
         $request = $this->buildRequestWithFind($entity, $controller);
 
         $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
-        $viewHandler->registerHandler('json', function($handler, $view) {
+
+        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
             return $view->getData();
         });
+
         $controller->setViewHandler($viewHandler);
 
         $this->assertEquals(null, $controller->deleteAction($entity->getId(), $request));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedExceptionMessage Not Found
+     */
+    public function test_delete_action_fail()
+    {
+        $controller = new ResourceController();
+        $entity = $this->getTestEntity();
+        $request = $this->buildRequestWithFind($entity, $controller, null, true);
+
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $controller->setViewHandler($viewHandler);
+
+        $controller->deleteAction($entity->getId(), $request);
+    }
+
+    public function test_update_action()
+    {
+        $controller = new ResourceController();
+        $entity = $this->getTestEntity();
+        $request = $this->buildRequestWithFind($entity, $controller);
+
+        $request->request->set('title', 'New Title');
+
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $this->jsonHandler($viewHandler);
+        $controller->setViewHandler($viewHandler);
+
+        $formFactory = $this->getFormFactory($entity);
+        $controller->setRequestFormFactory($formFactory);
+
+        $classMetadata = new ClassMetadata(get_class($entity));
+        $controller->setClassMetaData($classMetadata);
+
+        $this->assertEquals('{"id":1,"title":"New Title","description":"My Description"}', $controller->updateAction($entity->getId(), $request));
     }
 
     /**
@@ -211,11 +243,16 @@ class ResourceControllerTest extends TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getEntityManager($repository, $remove = null)
+    private function getEntityManager($repository, $remove = null, $removeException = false)
     {
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush'])->getMock();
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush', 'refresh'])->getMock();
         $entityManager->expects($this->any())->method('getRepository')->willReturn($repository);
-        $entityManager->expects($this->any())->method('remove')->willReturn($remove);
+
+        if ($removeException) {
+            $entityManager->expects($this->any())->method('remove')->willThrowException(new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException("Not Found"));
+        } else {
+            $entityManager->expects($this->any())->method('remove')->willReturn($remove);
+        }
 
         return $entityManager;
     }
@@ -290,16 +327,18 @@ class ResourceControllerTest extends TestCase
     }
 
     /**
-     * @param $entity
-     * @param $controller
+     * @param      $entity
+     * @param      $controller
+     * @param null $remove
+     * @param bool $removeException
      *
      * @return Request
      */
-    private function buildRequestWithFind($entity, $controller, $remove = null)
+    private function buildRequestWithFind($entity, $controller, $remove = null, $removeException = false)
     {
         $repository = $this->findByEntity($entity);
 
-        $entityManager = $this->getEntityManager($repository, $remove);
+        $entityManager = $this->getEntityManager($repository, $remove, $removeException);
         $controller->setEntityManager($entityManager);
 
         $parameterBag = $this->getParameterBag();
@@ -324,5 +363,36 @@ class ResourceControllerTest extends TestCase
             $forceRedirects,
             $defaultEngine
         );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getFormFactory(Book $entity)
+    {
+
+        $form = $this->getMockBuilder(DefaultResourceType::class)->disableOriginalConstructor()->setMethods(['handleRequest'])->getMock();
+        $form->expects($this->any())->method('handleRequest')->will($this->returnCallback(function ($arg) use (&$entity) {
+            $title = $arg->request->get('title');
+            $entity->setTitle($title);
+
+            return $entity;
+        }));
+        $formFactory = $this->getMockBuilder(RequestFormConfigurationInterface::class)->disableOriginalConstructor()->setMethods(['create'])->getMock();
+        $formFactory->expects($this->any())->method('create')->willReturn($form);
+
+        return $formFactory;
+    }
+
+    /**
+     * @param $viewHandler
+     */
+    private function jsonHandler($viewHandler)
+    {
+        $serializer = $this->getSerializer();
+
+        $viewHandler->registerHandler('json', function ($handler, $view) use (&$serializer) {
+            return $serializer->serialize($view->getData(), 'json');
+        });
     }
 }
