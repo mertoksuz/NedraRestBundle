@@ -8,7 +8,6 @@
   "license" : [
     "MIT"
   ],
-  "minimum-stability": "beta",
   "require": {
     "php": ">=5.5.9",
     "symfony/dependency-injection": "^3.3",
