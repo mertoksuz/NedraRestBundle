@@ -22,17 +22,6 @@ class ResourceController extends FOSRestController
     /** @var RequestFormConfigurationInterface */
     private $requestFormFactory;
 
-    /** @var \Doctrine\ORM\Mapping\ClassMetadata */
-    private $classMetaData;
-
-    /**
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $classMetaData
-     */
-    public function setClassMetaData($classMetaData)
-    {
-        $this->classMetaData = $classMetaData;
-    }
-
     /**
      * @param EntityManager $entityManager
      */
