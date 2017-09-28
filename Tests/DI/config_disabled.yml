@@ -1,0 +1,12 @@
+services:
+    form.factory:
+        class: stdClass
+    doctrine.orm.entity_manager:
+        class: stdClass
+
+nedra_rest:
+    active: false
+    entities:
+        app.model:
+            classes:
+                model: AppBundle\Entity\Model

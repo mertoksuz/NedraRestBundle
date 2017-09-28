@@ -1,0 +1,15 @@
+services:
+    form.factory:
+        class: stdClass
+    doctrine.orm.entity_manager:
+        class: stdClass
+
+nedra_rest:
+    active: true
+    entities:
+        app.model:
+            only: ['create', 'index']
+            classes:
+                model: AppBundle\Entity\Model
+                controller: Nedra\RestBundle\Controller\ResourceController
+                form: Nedra\RestBundle\Form\Type\DefaultResourceType

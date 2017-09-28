@@ -94,6 +94,25 @@ class ResourceController extends FOSRestController
         return $this->handleView($view);
     }
 
+    public function createAction(Request $request)
+    {
+        $model = $request->attributes->get("_nedrarest_model");
+
+        /** @var FormInterface $form */
+        $form = $this->requestFormFactory->create($request, $model);
+
+        $form->handleRequest($request);
+
+        $this->entityManager->persist($model);
+        $this->entityManager->flush();
+
+        $view = new View();
+        $view->setFormat('json');
+        $view->setData($model);
+
+        return $this->handleView($view);
+    }
+
     /**
      * @param Request $request
      * @param null    $id

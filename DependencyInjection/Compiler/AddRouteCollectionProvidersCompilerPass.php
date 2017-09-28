@@ -19,6 +19,12 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
      */
     public function process(ContainerBuilder $containerBuilder)
     {
+        $config = $containerBuilder->getExtensionConfig('nedra_rest');
+
+        if (is_array($config) && isset($config[0]['active']) && !$config[0]['active']) {
+            return;
+        }
+
         $this->initiateRouteCollectionLoaderWithProviderType(
             $containerBuilder,
             ModularRouterInterface::class,
@@ -29,16 +35,17 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
 
     /**
      * @param ContainerBuilder $containerBuilder
-     * @param $routeCollector
-     * @param $routeProvider
-     * @param $setterMethod
+     * @param                  $routeCollector
+     * @param                  $routeProvider
+     * @param                  $setterMethod
      */
     private function initiateRouteCollectionLoaderWithProviderType(
         ContainerBuilder $containerBuilder,
         $routeCollector,
         $routeProvider,
         $setterMethod
-    ) {
+    )
+    {
         $collectorDefinition = $this->getByRouteProvider($containerBuilder, $routeCollector);
         foreach ($containerBuilder->getDefinitions() as $name => $definition) {
             if (!is_subclass_of($definition->getClass(), $routeProvider)) {
@@ -51,7 +58,8 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
 
     /**
      * @param ContainerBuilder $containerBuilder
-     * @param $routeProvider
+     * @param                  $routeProvider
+     *
      * @return \Symfony\Component\DependencyInjection\Definition
      */
     private function getByRouteProvider(ContainerBuilder $containerBuilder, $routeProvider)
