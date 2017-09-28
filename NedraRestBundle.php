@@ -15,6 +15,5 @@ class NedraRestBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new AddRouteCollectionProvidersCompilerPass);
-        $container->addCompilerPass(new RegistryRegisterPass);
     }
 }

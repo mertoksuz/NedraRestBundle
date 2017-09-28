@@ -8,10 +8,6 @@ services:
         tags:
             - { name: router, priority: 50 }
 
-    nedra_rest.registry:
-        class: Nedra\RestBundle\Component\Registry
-        public: false
-
     nedra_rest.default_resource_type:
         class: Nedra\RestBundle\Form\Type\DefaultResourceType
         arguments:

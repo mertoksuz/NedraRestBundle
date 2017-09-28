@@ -19,11 +19,6 @@ final class AddRouteCollectionProvidersCompilerPass implements CompilerPassInter
      */
     public function process(ContainerBuilder $containerBuilder)
     {
-
-        if (!$containerBuilder->has(NedraRestBundle::REGISTRY_ID)) {
-            return;
-        }
-
         $this->initiateRouteCollectionLoaderWithProviderType(
             $containerBuilder,
             ModularRouterInterface::class,
