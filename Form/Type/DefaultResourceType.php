@@ -12,12 +12,23 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DefaultResourceType extends AbstractType
 {
+    /** @var EntityManager */
+    private $manager;
+
+    /**
+     * @param EntityManager $manager
+     */
+    public function __construct(EntityManager $manager)
+    {
+        $this->manager = $manager;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $classMetadata = (new ClassMetadata($options['model_class']));
+        $classMetadata = $this->manager->getClassMetadata($options['data_class']);
 
         if (1 < count($classMetadata->getIdentifier())) {
             throw new \RuntimeException('The default form factory does not support entity classes with multiple primary keys.');

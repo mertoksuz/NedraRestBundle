@@ -12,12 +12,10 @@ services:
         class: Nedra\RestBundle\Component\Registry
         public: false
 
-    nedra_rest.request_configuration_factory:
-        class: Nedra\RestBundle\Controller\RequestConfigurationFactory
-        public: false
-
     nedra_rest.default_resource_type:
         class: Nedra\RestBundle\Form\Type\DefaultResourceType
+        arguments:
+          - "@doctrine.orm.entity_manager"
         public: false
         tags: ['form.type']
 
