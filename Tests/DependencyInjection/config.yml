@@ -1,8 +1,0 @@
-framework:
-    secret:          secret
-    test: ~
-    router:          { resource: "%kernel.root_dir%/routing.yml" }
-    form:            true
-    validation:      { enable_annotations: true }
-    templating:      { engines: ['twig'] }
-

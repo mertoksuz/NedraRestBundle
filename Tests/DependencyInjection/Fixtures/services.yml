@@ -1,9 +1,0 @@
-services:
-    nedra_rest.route_provider:
-        class: Nedra\RestBundle\Routing\Provider\RouteCollectionProvider
-        arguments: ["%nedrarest.config%"]
-        autowire: true
-
-    Nedra\RestBundle\Routing\ModularRouter:
-        tags:
-            - { name: router, priority: 50 }
