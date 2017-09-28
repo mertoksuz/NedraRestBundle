@@ -2,6 +2,7 @@
 namespace Nedra\RestBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Nedra\RestBundle\Metadata\MetadataInterface;
 use Nedra\RestBundle\Form\Type\DefaultResourceType;
 use Nedra\RestBundle\Component\RegistryInterface;
@@ -17,23 +18,19 @@ class RequestFormConfiguration implements RequestFormConfigurationInterface
     /** @var FormFactoryInterface */
     private $formFactory;
 
-    /** @var RegistryInterface */
-    private $registry;
-
-
-    public function __construct(FormFactoryInterface $formFactory, RegistryInterface $registry)
+    public function __construct(FormFactoryInterface $formFactory)
     {
         $this->formFactory = $formFactory;
-        $this->registry = $registry;
     }
 
-    public function create(MetadataInterface $metadata, Request $request, $resource)
+    public function create(Request $request, $resource)
     {
         $parameters = $request->attributes->all();
-        $formClass = $parameters["_nedrarest"]["form"];
+        $formClass = $parameters["_nedrarest_form"];
+        $modelClass = $parameters["_nedrarest_model"];
 
         $formOptions = [
-            'data_class' => $metadata->getClass("model")
+            'data_class' => $modelClass,
         ];
 
         return $this->formFactory->createNamed('', $formClass, $resource, array_merge($formOptions, ['method' => $request->getMethod(), 'csrf_protection' => false]));

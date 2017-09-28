@@ -10,5 +10,5 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface RequestFormConfigurationInterface
 {
-    public function create(MetadataInterface $metadata, Request $request, $resource);
+    public function create(Request $request, $resource);
 }

@@ -5,8 +5,6 @@ namespace Nedra\RestBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use Nedra\RestBundle\Metadata\MetadataInterface;
-use Nedra\RestBundle\Component\RegistryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,40 +16,47 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ResourceController extends FOSRestController
 {
-    /** @var MetadataInterface */
-    private $metadata;
-
-    /** @var RegistryInterface */
-    private $registry;
-
     /** @var EntityManager */
     private $entityManager;
-
-    /** @var RequestConfigurationInterface */
-    private $requestConfigurationFactory;
 
     /** @var RequestFormConfigurationInterface */
     private $requestFormFactory;
 
-    public function __construct(
-        RegistryInterface $registry,
-        RequestConfigurationInterface $requestConfiguration,
-        EntityManager $entityManager,
-        RequestFormConfigurationInterface $requestFormConfiguration
-    )
+    /** @var \Doctrine\ORM\Mapping\ClassMetadata */
+    private $classMetaData;
+
+    /**
+     * @param \Doctrine\ORM\Mapping\ClassMetadata $classMetaData
+     */
+    public function setClassMetaData($classMetaData)
     {
-        $this->registry = $registry;
-        $this->requestConfigurationFactory = $requestConfiguration;
+        $this->classMetaData = $classMetaData;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function setEntityManager($entityManager)
+    {
         $this->entityManager = $entityManager;
-        $this->requestFormFactory = $requestFormConfiguration;
+    }
+
+    /**
+     * @param RequestFormConfigurationInterface $requestFormFactory
+     */
+    public function setRequestFormFactory($requestFormFactory)
+    {
+        $this->requestFormFactory = $requestFormFactory;
     }
 
     public function indexAction(Request $request)
     {
-        $result = $this->findOr404($request);
+        $result = $this->findAllOr404($request);
 
         $view = new View();
         $view->setData($result);
+        $view->setFormat('json');
+
         return $this->handleView($view);
     }
 
@@ -61,6 +66,8 @@ class ResourceController extends FOSRestController
 
         $view = new View();
         $view->setData($result);
+        $view->setFormat('json');
+
         return $this->handleView($view);
     }
 
@@ -73,7 +80,9 @@ class ResourceController extends FOSRestController
 
         $view = new View();
         $view->setData(null);
+        $view->setFormat('json');
         $view->setStatusCode(Response::HTTP_NO_CONTENT);
+
         return $this->handleView($view);
     }
 
@@ -82,7 +91,7 @@ class ResourceController extends FOSRestController
         $result = $this->findOr404($request, $id);
 
         /** @var FormInterface $form */
-        $form = $this->requestFormFactory->create($this->metadata, $request, $result);
+        $form = $this->requestFormFactory->create($request, $result);
 
         $form->handleRequest($request);
 
@@ -90,30 +99,37 @@ class ResourceController extends FOSRestController
         $this->entityManager->refresh($result);
 
         $view = new View();
+        $view->setFormat('json');
         $view->setData($result);
+
         return $this->handleView($view);
     }
 
     /**
      * @param Request $request
-     * @param null $id
+     * @param null    $id
+     *
      * @return array|null|object
      */
-    private function findOr404(Request $request, $id = null)
+    public function findOr404(Request $request, $id = null)
     {
-        /** @var MetadataInterface $configuration */
-        $configuration = $this->requestConfigurationFactory->create($this->registry, $request);
-        $this->metadata = $configuration;
-
-        $model = $configuration->getClass("model");
-        if (!$id) {
-            $result = $this->entityManager->getRepository($model)->findAll();
-        } else {
-            $result = $this->entityManager->getRepository($model)->find($id);
-        }
+        $model = $request->attributes->get("_nedrarest_model");
+        $result = $this->entityManager->getRepository($model)->find($id);
 
         if (!$result) {
-            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $configuration->getHumanizedName()));
+            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $model));
+        }
+
+        return $result;
+    }
+
+    public function findAllOr404(Request $request)
+    {
+        $model = $request->attributes->get("_nedrarest_model");
+        $result = $this->entityManager->getRepository($model)->findAll();
+
+        if (!$result) {
+            throw new NotFoundHttpException(sprintf('The "%s" has not been found', $model));
         }
 
         return $result;
