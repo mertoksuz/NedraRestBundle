@@ -10,7 +10,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class NedraRestBundle extends Bundle
 {
     const DRIVER_DOCTRINE_ORM = "doctrine";
-    const REGISTRY_ID = 'nedra_rest.registry';
 
     public function build(ContainerBuilder $container)
     {
