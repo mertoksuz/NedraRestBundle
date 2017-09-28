@@ -1,6 +1,7 @@
 <?php
 namespace Nedra\RestBundle\Tests\DI;
 
+use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
 use Nedra\RestBundle\Routing\Provider\RouteCollectionProvider;
@@ -23,6 +24,13 @@ class ConfigurationTest extends TestCase
     {
         $container = $this->createContainer('config_disabled.yml');
         $this->assertArrayNotHasKey('nedra_rest.route_provider', $container->getDefinitions());
+    }
+
+    public function test_compiler_if_bundle_not_active()
+    {
+        $container = $this->createContainer('config_disabled.yml');
+        $container->compile();
+        $this->assertArrayNotHasKey('nedra_rest.modular_routing', $container->getDefinitions());
     }
 
     public function test_routes_are_generated_by_given_entities()
@@ -71,6 +79,19 @@ class ConfigurationTest extends TestCase
         $routeCollectionProvider->getRouteCollection();
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid alias supplied, it should conform to the following format "<applicationName>.<name>".
+     */
+    public function test_invalid_alias()
+    {
+        $container = $this->createContainer('config_invalid_alias.yml');
+        $config = $this->getNedraRestConfig($container);
+
+        $routeCollectionProvider = new RouteCollectionProvider($config);
+        $routeCollectionProvider->getRouteCollection();
+    }
+
     private function createContainer($config = 'config.yml')
     {
         /** @var ContainerBuilder $container */
@@ -84,8 +105,6 @@ class ConfigurationTest extends TestCase
         $fileLocator = new FileLocator([__DIR__]);
         $loader = new YamlFileLoader($container, $fileLocator);
         $loader->load($config);
-
-        //$container->compile();
 
         return $container;
     }

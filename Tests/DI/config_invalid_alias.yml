@@ -5,9 +5,9 @@ services:
         class: stdClass
 
 nedra_rest:
-    active: false
+    active: true
     entities:
-        app.model:
+        app*model:
             classes:
                 model: AppBundle\Entity\Model
                 controller: Nedra\RestBundle\Controller\ResourceController
