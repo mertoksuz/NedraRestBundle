@@ -63,7 +63,6 @@ app_model_delete            DELETE      ANY      ANY    /models/{id}
 nedra_rest:
     entities:
         app.model:
-            identifier: id # you can change {id} to {slug}
             path: model # you can change /models/ to /cars/
             except: ['show']
             only: ['create', 'index']
