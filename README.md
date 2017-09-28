@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/mertoksuz/NedraRestBundle.svg?branch=master)](https://travis-ci.org/mertoksuz/NedraRestBundle)
-[![Coverage Status](https://coveralls.io/repos/github/mertoksuz/NedraRestBundle/badge.svg?branch=master)](https://coveralls.io/github/mertoksuz/NedraRestBundle?branch=master) 
 # NedraRestBundle
 
 NedraRestBundle creates automatically a REST API based on your models. Just give your models and use your auto-generated endpoints.
