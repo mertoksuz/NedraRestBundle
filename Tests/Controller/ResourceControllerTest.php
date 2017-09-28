@@ -4,6 +4,7 @@ namespace Nedra\RestBundle\Tests\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use FOS\RestBundle\View\ViewHandler;
 use Nedra\RestBundle\Controller\RequestFormConfigurationInterface;
 use Nedra\RestBundle\Controller\ResourceController;
@@ -193,6 +194,25 @@ class ResourceControllerTest extends TestCase
         $this->assertEquals('{"id":1,"title":"New Title","description":"My Description"}', $controller->updateAction($entity->getId(), $request));
     }
 
+    public function test_create_action()
+    {
+        $controller = new ResourceController();
+        $entity = new Book();
+        $request = $this->buildRequestWithFind($entity, $controller);
+
+        $request->request->set('title', 'New Title');
+        $request->request->set('description', 'New Desc');
+
+        $viewHandler = $this->createViewHandler(['json' => true, 'html' => false, 'xml' => false]);
+        $this->jsonHandler($viewHandler);
+        $controller->setViewHandler($viewHandler);
+
+        $formFactory = $this->getFormFactory($entity);
+        $controller->setRequestFormFactory($formFactory);
+
+        $this->assertEquals('{"id":1,"title":"New Title","description":"My Desc"}', $controller->createAction($request));
+    }
+
     /**
      * @return ParameterBag
      */
@@ -241,7 +261,7 @@ class ResourceControllerTest extends TestCase
      */
     private function getEntityManager($repository, $remove = null, $removeException = false)
     {
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush', 'refresh'])->getMock();
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->setMethods(['getRepository', 'remove', 'flush', 'refresh', 'getClassMetadata','persist'])->getMock();
         $entityManager->expects($this->any())->method('getRepository')->willReturn($repository);
 
         if ($removeException) {
@@ -249,6 +269,14 @@ class ResourceControllerTest extends TestCase
         } else {
             $entityManager->expects($this->any())->method('remove')->willReturn($remove);
         }
+
+        $entityManager->expects($this->any())->method('getClassMetadata')->willReturn(new ClassMetadata('Nedra\RestBundle\Tests\Entity\Book'));
+        $entityManager->expects($this->any())->method('persist')->will($this->returnCallback(function ($arg) {
+            $arg->setTitle('New Title');
+            $arg->setDescription('My Desc');
+            $arg->setId(1);
+            return $arg;
+        }));
 
         return $entityManager;
     }
