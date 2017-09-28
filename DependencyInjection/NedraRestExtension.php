@@ -51,7 +51,7 @@ class NedraRestExtension extends Extension implements PrependExtensionInterface
                     }
 
                     if (!isset($rule['priorities'])) {
-                        $rules['priorities'] = ['json', 'xml'];
+                        $rules['priorities'] = ['json'];
                         $append = true;
                     }
 
@@ -67,7 +67,7 @@ class NedraRestExtension extends Extension implements PrependExtensionInterface
                 }
             } else {
                 $rules['path'] = '^/';
-                $rules['priorities'] = ['json', 'xml'];
+                $rules['priorities'] = ['json'];
                 $rules['fallback_format'] = "json";
                 $rules['prefer_extension'] = false;
                 $append = true;
