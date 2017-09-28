@@ -49,7 +49,7 @@ final class RouteCollectionProvider implements RouteCollectionProviderInterface
             $metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
 
             $rootPath = sprintf('/%s/', isset($configuration['path']) ? $configuration['path'] : Urlizer::urlize($metadata->getPluralName()));
-            $identifier = sprintf('{%s}', $configuration['identifier']);
+            $identifier = sprintf('{%s}', 'id');
 
             if (in_array('index', $routesToGenerate)) {
                 $indexRoute = $this->createRoute($rootPath, $configuration, 'index', ['GET']);
