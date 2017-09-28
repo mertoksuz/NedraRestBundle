@@ -30,8 +30,13 @@ services:
         resource: '../../Controller'
 
         calls:
-            - [method: "setRequestConfigurationFactory", arguments: ["@doctrine.orm.entity_manager"]]
-            - [method: "setRequestFormFactory", arguments: ["@nedra_rest.request_form_factory"]]
+            - method: "setRequestConfigurationFactory"
+              arguments:
+                - "@doctrine.orm.entity_manager"
+
+            - method: "setRequestFormFactory"
+              arguments:
+                - "@nedra_rest.request_form_factory"
 
         public: true
         tags: ['controller.service_arguments']
