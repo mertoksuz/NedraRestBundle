@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
+use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Class ResourceController
  * @package Nedra\RestBundle\Controller
@@ -96,19 +96,19 @@ class ResourceController extends FOSRestController
 
     public function createAction(Request $request)
     {
-        $model = $request->attributes->get("_nedrarest_model");
+        $instance = $this->createInstanceFromRequest($request);
 
         /** @var FormInterface $form */
-        $form = $this->requestFormFactory->create($request, $model);
+        $form = $this->requestFormFactory->create($request, $instance);
 
         $form->handleRequest($request);
 
-        $this->entityManager->persist($model);
+        $this->entityManager->persist($instance);
         $this->entityManager->flush();
 
         $view = new View();
         $view->setFormat('json');
-        $view->setData($model);
+        $view->setData($instance);
 
         return $this->handleView($view);
     }
@@ -141,5 +141,19 @@ class ResourceController extends FOSRestController
         }
 
         return $result;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
+    private function createInstanceFromRequest(Request $request)
+    {
+        $model = $request->attributes->get("_nedrarest_model");
+        $metadata = $this->entityManager->getClassMetadata($model);
+        $instance = $metadata->newInstance();
+
+        return $instance;
     }
 }
