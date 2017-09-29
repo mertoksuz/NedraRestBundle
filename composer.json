@@ -9,7 +9,6 @@
     "MIT"
   ],
   "require": {
-    "php": ">=5.6",
     "symfony/dependency-injection": "^3.3",
     "symfony/framework-bundle": "^3.3",
     "symfony/http-kernel": "^3.3",

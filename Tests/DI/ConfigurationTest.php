@@ -1,7 +1,6 @@
 <?php
 namespace Nedra\RestBundle\Tests\DI;
 
-use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
 use Nedra\RestBundle\Routing\Provider\RouteCollectionProvider;
@@ -81,7 +80,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid alias supplied, it should conform to the following format "<applicationName>.<name>".
+     * @expectedExceptionMessage Invalid alias supplied, it should conform to the following format
+     *                           "<applicationName>.<name>".
      */
     public function test_invalid_alias()
     {
@@ -114,7 +114,7 @@ class ConfigurationTest extends TestCase
      *
      * @return array
      */
-    private function getNedraRestConfig($container)
+    private function getNedraRestConfig(ContainerBuilder $container)
     {
         $configs = $container->getExtensionConfig('nedra_rest');
 
