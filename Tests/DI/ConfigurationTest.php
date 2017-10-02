@@ -1,14 +1,18 @@
 <?php
 namespace Nedra\RestBundle\Tests\DI;
 
+use Nedra\RestBundle\DependencyInjection\Compiler\AddRouteCollectionProvidersCompilerPass;
 use Nedra\RestBundle\DependencyInjection\NedraRestExtension;
 use Nedra\RestBundle\NedraRestBundle;
+use Nedra\RestBundle\Routing\ModularRouter;
 use Nedra\RestBundle\Routing\Provider\RouteCollectionProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 class ConfigurationTest extends TestCase
 {
@@ -90,6 +94,40 @@ class ConfigurationTest extends TestCase
 
         $routeCollectionProvider = new RouteCollectionProvider($config);
         $routeCollectionProvider->getRouteCollection();
+    }
+
+    public function test_compiler_pass()
+    {
+        $container = new ContainerBuilder(new ParameterBag([]));
+        $container->registerExtension(new NedraRestExtension());
+        $container->addCompilerPass(new AddRouteCollectionProvidersCompilerPass());
+        $fileLocator = new FileLocator([__DIR__]);
+        $loader = new YamlFileLoader($container, $fileLocator);
+        $loader->load('config.yml');
+        $container->compile();
+        $this->assertInstanceOf(RouteCollection::class, $routes = $container->get("nedra_rest.route_provider")->getRouteCollection());
+    }
+
+    /**
+     * @expectedExceptionMessage Unable to generate a URL for the named route "/models/does_not_exist" as such route does not exist.
+     * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function test_modular_class()
+    {
+        $container = $this->createContainer();
+        $routeCollection = new RouteCollectionProvider($container->getExtensionConfig('nedra_rest')[0]);
+        $modular = new ModularRouter();
+        $modular->addRouteCollectionProvider($routeCollection);
+        $this->assertEquals($routeCollection->getRouteCollection(), $modular->getRouteCollection());
+
+        $modular->setContext(new RequestContext("/", "get", "localhost", 'http', 80, 443, '/models'));
+        $this->assertEquals('...',  $modular->getContext());
+
+        $modular->match('/models/');
+        $modular->match('/models/new');
+        $modular->match('/models/{id}');
+
+        $modular->generate('/models/does_not_exist', []);
     }
 
     private function createContainer($config = 'config.yml')
